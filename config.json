@@ -21,7 +21,7 @@
                     "depends": [ "jQuery", "_" ]
                 }
             }
-        },
+        }
     },
     "spell-histogram": {
         "author": "Radek",
@@ -51,7 +51,7 @@
                     "depends": [ "jQuery", "_" ]
                 }
             }
-        },
+        }
     },
     "mouse-phenotype-dendrogram": {
         "author": "Radek",
