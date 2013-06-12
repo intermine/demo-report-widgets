@@ -108,9 +108,17 @@
         }
     },
     "ontology-graph": {
+        "author": "Alex Kalderimis",
+        "classExpr": "require('ontology-widget')",
+        "description": "The super spaghetti monster",
+        "title": "Gene Ontology Annotations for a given Gene",
+        "version": "0.0.1",
         "css": {
             "font-awesome": {
                 "path": "http: //cdn.intermine.org/css/font-awesome/3.0.2/css/font-awesome.css"
+            },
+            "foundation": {
+                "path": "http://cdn.intermine.org/css/foundation/4.0-prefixed/css/foundation.min.css"
             }
         },
         "js": {
