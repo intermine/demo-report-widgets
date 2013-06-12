@@ -1,4 +1,4 @@
-# Demo InterMine FatApps
+# Example InterMine FatApps
 
 This repo is being used by [InterMine FatApps Middleware (Node.js)](https://github.com/intermine/intermine-fatapps-middleware).
 
