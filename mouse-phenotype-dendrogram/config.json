@@ -1,5 +1,5 @@
 {
-    "author": "Radek",
+    "author": "Radek <rs676@cam.ac.uk>",
     "title": "Mouse Phenotype Dendrogram Clustering",
     "description": "Replaces a tag cloud of phenotypes associated with alleles and their scores",
     "version": "0.3.4",
