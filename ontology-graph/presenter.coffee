@@ -37,7 +37,7 @@ $ = jQuery
 #
 
 
-class Widget extends Backbone.View
+class App extends Backbone.View
 
     initialize: (@config, @templates) ->
       @service = new intermine.Service @config.service
@@ -59,7 +59,7 @@ class Widget extends Backbone.View
       spline: '.spline'
 
     startListening: ->
-      for key, sel of Widget.BINDINGS then do (sel) =>
+      for key, sel of App.BINDINGS then do (sel) =>
           @listenTo @model, 'change:' + key, (m, v) => @$(sel).val v
 
       @listenTo @model, 'change:query', @loadData
@@ -112,7 +112,7 @@ class Widget extends Backbone.View
 
     renderChrome: ->
       @$el.html @templates.widget
-      for key, sel of Widget.BINDINGS
+      for key, sel of App.BINDINGS
         @$(sel).val @model.get key
       setUpOntologyTable()
 
@@ -186,7 +186,7 @@ class Widget extends Backbone.View
           'click .graph-control .resizer': 'toggleDisplayOptions'
           'click .graph-reset': => @trigger 'graph:reset'
 
-      for key, sel of Widget.BINDINGS
+      for key, sel of App.BINDINGS
           evts['change ' + sel] = -> state.set key, $(@).val()
 
       switches =

@@ -13,8 +13,8 @@ Set the assertion on the window object.
 @.assert = (exp, message) -> throw new AssertException(message) unless exp
 
 
-# This class encapsulates the Widget behavior.
-class Widget
+# This class encapsulates the App behavior.
+class App
 
     # PathQueries to fetch the allele terms for a symbol and high level terms for these terms.
     pq:
@@ -138,8 +138,8 @@ class Widget
 
     # Render the graph.
     render: (@target) ->
-        # Render the widget wrapper.
-        $(@target).html @templates.widget
+        # Render the app wrapper.
+        $(@target).html @templates.app
             'symbol': @config.symbol
 
         do dis = =>
@@ -283,7 +283,7 @@ class Widget
                         'template': @templates.popover
 
 
-# Config toolbox widget controls thingie.
+# Config toolbox app controls thingie.
 class Config
     
     opts:

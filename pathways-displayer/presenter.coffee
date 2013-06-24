@@ -18,8 +18,8 @@ Set the assertion on the window object.
 $ = jQuery or Zepto
 
 
-### Behavior of the widget.###
-class Widget
+### Behavior of the app.###
+class App
 
     constructor: (@config, @templates) ->
         @service = new intermine.Service 'root': 'http://beta.flymine.org/beta'

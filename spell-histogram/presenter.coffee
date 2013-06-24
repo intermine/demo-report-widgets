@@ -13,9 +13,9 @@ Set the assertion on the window object.
 @.assert = (exp, message) -> throw new AssertException(message) unless exp
 
 
-# This is my widget definition, needs to have a set signature.
-# There always needs to be one and only one class `Widget`.
-class Widget
+# This is my app definition, needs to have a set signature.
+# There always needs to be one and only one class `App`.
+class App
 
     # Google Visualization chart options.
     chartOptions:

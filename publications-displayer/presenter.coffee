@@ -43,7 +43,7 @@ class Table extends Backbone.View
         done = =>
             symbol = $(e.target).val()
             if symbol isnt '' and symbol isnt @symbol
-                # Borrow the data loader from Widget.
+                # Borrow the data loader from the App.
                 $.when(@data(symbol)).then((records) =>
                     # Long live the new King.
                     @symbol = symbol
@@ -57,8 +57,8 @@ class Table extends Backbone.View
         @timeout = root.setTimeout(done, 500)
 
 
-# This is my widget definition, needs to have a set signature.
-class Widget
+# This is my app definition, needs to have a set signature.
+class App
 
     # Have access to config and templates compiled in.
     constructor: (@config, @templates) ->

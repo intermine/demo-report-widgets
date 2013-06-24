@@ -84,8 +84,8 @@ class Form extends Backbone.View
         ], (err, q) ->
             self.config.cb err, false, q
 
-# This is my widget definition, needs to have a set signature.
-class Widget
+# This is my app definition, needs to have a set signature.
+class App
 
     # Have access to config and templates compiled in.
     constructor: (@config, @templates) ->
