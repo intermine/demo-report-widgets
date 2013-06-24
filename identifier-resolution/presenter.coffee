@@ -7,10 +7,7 @@ class Form extends Backbone.View
 
     render: ->
         # Populate the template.
-        $(@el).html @templates[@config.type]
-            'defaults': @config.defaults
-            'types': @config.classes
-            'organisms': @config.organisms
+        $(@el).html @templates[@config.type] @config
 
         @
 
@@ -38,7 +35,7 @@ class Form extends Backbone.View
         # Get the form.
         async.waterfall [ (cb) ->
             # Get the identifiers.
-            input.ids = clean $(self.el).find('form textarea[name="identifiers"]').val()
+            input.ids = clean $(self.el).find('form *[name="input"]').val()
 
             # Do we have any?
             return cb 'No identifiers have been provided' if input.ids.length is 0

@@ -1,14 +1,13 @@
 <div class="row">
     <div class="large-12 columns">
-        <h1 class="title">Resolve identifiers</h1>
-        <p class="description">Type/paste in identifiers that are whitespace (space, tab, newline) separated.</p>
+        <h1 class="title">Resolve an identifier</h1>
     </div>
 </div>
 <div class="row">
     <form class="custom">
         <div class="large-6 columns">
-            <label>List of identifiers</label>
-            <textarea name="input" placeholder="<%= @defaults.identifiers.join(' ') %>"><%= @provided?.identifiers.join(' ') %></textarea>
+            <label>Identifier</label>
+            <input type="text" name="input" placeholder="<%= @defaults.identifiers[0] %>" value="<%= @provided?.identifiers %>" />
         </div>
         <div class="large-3 columns">
             <label>Type</label>
