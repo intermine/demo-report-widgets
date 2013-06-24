@@ -1,0 +1,46 @@
+{
+    "author": "Radek <rs676@cam.ac.uk>",
+    "title": "Choose a list",
+    "description": "Choose from among InterMine lists user has access to",
+    "version": "0.0.1",
+    "dependencies": {
+        "css": {
+            "FoundationCSS": {
+                "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.css"
+            }
+        },
+        "js": {
+            "jQuery": {
+                "path": "http://cdn.intermine.org/js/jquery/1.10.1/jquery.min.js"
+            },
+            "_": {
+                "path": "http://cdn.intermine.org/js/underscore.js/1.4.4/underscore-min.js"
+            },
+            "Backbone": {
+                "path": "http://cdn.intermine.org/js/backbone.js/1.0.0/backbone-min.js",
+                "depends": [
+                    "jQuery",
+                    "_"
+                ]
+            },
+            "intermine.imjs": {
+                "path": "http://cdn.intermine.org/js/intermine/imjs/latest/im.js",
+                "depends": [
+                    "jQuery",
+                    "_"
+                ]
+            },
+            "async": {
+                "path": "http://cdn.intermine.org/js/async/0.2.6/async.min.js",
+                "depends": [ "setImmediate" ]
+            },
+            "setImmediate": {
+                "path": "http://cdn.intermine.org/js/setImmediate/1.0.1/setImmediate.min.js"
+            },
+            "Foundation": {
+                "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.js",
+                "depends": [ "jQuery" ]
+            }
+        }
+    }
+}
