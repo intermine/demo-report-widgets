@@ -3,15 +3,33 @@
 // A single row with our list.
 class Row extends Backbone.View {
 
+    // Render into table rows.
+    tagName: string;
+
+    constructor(private opts: any) {
+        super();
+
+        this.tagName = "tr";
+    }
+
+    render(): Row {
+        // Render our template.
+        $(this.el).html(this.opts.template({}));
+
+        // Chain.
+        return this;
+    }
+
 }
 
 // Complete table of all lists.
 class Table extends Backbone.View {
 
+    private rows: Row[] = [];
+    private service: any;
+
     constructor(private opts: any) {
         super();
-
-        var self: any = this;
 
         // Pass these opts onward.
         var imjs: any = {
@@ -21,11 +39,37 @@ class Table extends Backbone.View {
         };
 
         // Create a new Service connection.
-        var service: Object = new intermine.Service(imjs);
+        this.service = new intermine.Service(imjs);
+    }
+
+    render(): Table {
+        var self: any = this;
+
+        // Render the template with data.
+        $(this.el).html((<EcoTemplate> this.opts.templates['table'])());
 
         // Get the user's lists.
         async.waterfall([ function(cb: Function) {
-            cb('trouble');
+            self.service.fetchLists(function(lists: intermine.List[]) {
+                cb(null, lists);
+            });
+
+            // Render a row per our list.
+        }, function(lists: any[], cb: Function) {
+            var tbody: JQuery = $(self.el).find('tbody');
+            lists.forEach(function(list: intermine.List) {
+                // new View.
+                var row: Row = new Row({
+                    // Lose the fns.
+                    model: <Object> JSON.stringify(list),
+                    // Pass in our template.
+                    template: <EcoTemplate> self.opts.templates['row']
+                });
+                // Render into table.
+                tbody.html(row.render().el);
+                // Push to stack.
+                self.rows.push(row);
+            });
 
         }], function(err: string) {
             if (err) {
@@ -33,9 +77,7 @@ class Table extends Backbone.View {
                 return;
             }
         });
-    }
 
-    render(): Backbone.View {
         // Chain.
         return this;
     }
@@ -49,7 +91,9 @@ class App {
         private config: {
             cb(err: Error, working: bool, list: any): void
         },
-        private templates: Object
+        private templates: {
+            table: EcoTemplate
+        }
     ) {
         // Make sure we have something to call to.
         if (this.config.cb == null || typeof(this.config.cb) !== 'function') {

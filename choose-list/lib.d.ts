@@ -1,13 +1,38 @@
-// imjs.
-interface InterMine {
-    Service(opts: {
-        root: string
-        token: string
-        errorHandler(): void
-    }): void;
+// eco templates.
+interface EcoTemplate {
+    (context?: any): string;
 }
 
-declare var intermine: InterMine;
+// imjs.
+interface Promise {}
+declare module intermine {
+    export class List {
+        authorized: bool;
+        dateCreated: string;
+        description: string;
+        folders: any[];
+        name: string;
+        size: number;
+        status: string;
+        tags: string[];
+        timestamp: number;
+        title: string;
+        type: string;
+    }
+
+    interface InterMineServiceListsCallback {
+        (lists: List[]): void;
+    }
+
+    export class Service {
+        constructor (opts: {
+            root: string
+            token: string
+            errorHandler(): void
+        });
+        fetchLists(cb: (lists: intermine.List[]) => void ): Promise;
+    }
+}
 
 // async.
 interface AsyncResultsCallback {
@@ -21,9 +46,11 @@ declare var async: Async;
 // jQuery.
 interface JQuery {
     html(JQuery): JQuery
+    find(selector: string): JQuery;
 }
 interface JQueryStatic {
     (): JQuery;
+    (element: HTMLElement): JQuery;
     (selector: string, context?: any): JQuery;
 }
 declare var jQuery: JQueryStatic;
@@ -107,5 +134,6 @@ declare module Backbone {
         remove(): void;
         delegateEvents(events?: any): void;
         undelegateEvent(): void;
+        tagName: string;
     }
 }
