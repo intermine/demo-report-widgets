@@ -1,4 +1,5 @@
-{
+// Will be converted to plain JS Object.
+module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Publications for Gene",
     "description": "Shows a list of publications for a specific gene",
@@ -18,6 +19,25 @@
             "intermine.imjs": {
                 "path": "http://cdn.intermine.org/js/intermine/imjs/latest/imjs.js",
                 "depends": [ "jQuery", "_" ]
+            }
+        }
+    },
+    // Example config. Pass this from your middleware that knows about the mine it connects to.
+    "config": {
+        "mine": "http://beta.flymine.org/beta",
+        "pathQueries": {
+            "pubsForGene": {
+                "select": [
+                    "publications.title",
+                    "publications.year",
+                    "publications.journal",
+                    "publications.pubMedId",
+                    "publications.authors.name"
+                ],
+                "from": "Gene",
+                "joins": [
+                    "publications.authors"
+                ]
             }
         }
     }

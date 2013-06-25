@@ -1,4 +1,5 @@
-{
+// Will be converted to plain JS Object.
+module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Pathways from other mines",
     "description": "Shows for each pathway which mines carry it",
@@ -25,6 +26,32 @@
             "jQueryFoundationTooltips": {
                 "path": "http://cdn.intermine.org/css/foundation/3.1.1-prefixed/javascripts/jquery.foundation.tooltips.js",
                 "depends": [ "jQuery" ]
+            }
+        }
+    },
+    // Example config. Pass this from your middleware that knows about the mine it connects to.
+    "config": {
+        "mines": {
+            "FlyMine": "http://beta.flymine.org/beta",
+            "metabolicMine": "http://metabolicmine.org/beta"
+        },
+        "organisms": [
+            "fruit fly",
+            "house mouse",
+            "human"
+        ],
+        "pathQueries": {
+            "homologues": {
+                "select": [
+                    "Gene.homologues.homologue.primaryIdentifier"
+                ]
+            },
+            "pathways": {
+                "select": [
+                    "Gene.pathways.name",
+                    "Gene.pathways.curated",
+                    "Gene.organism.commonName"
+                ]
             }
         }
     }

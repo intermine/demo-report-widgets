@@ -6,11 +6,8 @@ class Table extends Backbone.View {
 
 class App {
 
-    constructor(
-        public config: Object,
-        public templates: Object
-    ) {
-
+    constructor(config: Object, templates: Object) {
+        
     }
 
     render(target: string): void {

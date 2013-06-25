@@ -1,4 +1,5 @@
-{
+// Will be converted to plain JS Object.
+module.exports = {
     "author": "Alex Kalderimis",
     "classExpr": "require('ontology-widget')",
     "description": "The super spaghetti monster",

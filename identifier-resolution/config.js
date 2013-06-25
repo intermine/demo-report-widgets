@@ -1,4 +1,5 @@
-{
+// Will be converted to plain JS Object.
+module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Resolve Identifiers",
     "description": "Resolve a bunch of identifiers in InterMine and return a PathQuery",
@@ -43,6 +44,43 @@
             },
             "buckets": {
                 "path": "http://cdn.intermine.org/js/buckets/latest/buckets.min.js"
+            }
+        }
+    },
+    // Example config.
+    "config": {
+        // Pass the following to the App from the client.
+        'mine': 'http://beta.flymine.org/beta', // which mine to connect to
+        'type': 'many', // one OR many
+        // Defaults in the forms.
+        'defaults': {
+            'identifiers': [ 'PPARG', 'ZEN', 'MAD', 'ftz', 'Adh' ], // one identifier taken from the head
+            'type': 'Gene',
+            'organism': 'D. melanogaster'
+        },
+        // Provided input, if any.
+        'provided': {
+            'identifiers': [ 'MAD' ],
+            'type': 'Gene',
+            'organism': 'C. elegans'
+        },
+        // A callback called at least once.
+        cb: function(err, working, query) {
+            // Has error happened?
+            if (err) throw err;
+            // Are you working?
+            console.log('working:', working);
+            // Are you done? Dump the query then.
+            console.log('query:', query);
+        },
+        
+        // Pass this from your middleware that knows about the mine it connects to.
+        "pathQueries": {
+            "organisms": {
+                "select": [
+                    "Organism.shortName",
+                    "Organism.name"
+                ]
             }
         }
     }

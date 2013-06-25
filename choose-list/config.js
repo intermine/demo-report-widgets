@@ -1,4 +1,5 @@
-{
+// Will be converted to plain JS Object.
+module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Choose a list",
     "description": "Choose from among InterMine lists user has access to",
