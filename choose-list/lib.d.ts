@@ -1,3 +1,23 @@
+// imjs.
+interface InterMine {
+    Service(opts: {
+        root: string
+        token: string
+        errorHandler(): void
+    }): void;
+}
+
+declare var intermine: InterMine;
+
+// async.
+interface AsyncResultsCallback {
+    (err: string, results?: any): void;
+}
+interface Async {
+    waterfall(tasks: any[], cb: AsyncResultsCallback): void;
+}
+declare var async: Async;
+
 // jQuery.
 interface JQuery {
     html(JQuery): JQuery
@@ -83,7 +103,7 @@ declare module Backbone {
         setElement(element: HTMLElement, delegate?: bool): void;
         attributes: any;
         $(selector: string): any;
-        render(): void;
+        render(): View;
         remove(): void;
         delegateEvents(events?: any): void;
         undelegateEvent(): void;
