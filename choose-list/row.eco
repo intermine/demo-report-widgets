@@ -1,0 +1,5 @@
+<td><input type="checkbox" /></td>
+<td><span class="star></span></td>
+<td><span class="title"></span></td>
+<td><span class="owner"></span></td>
+<td><span class="created"></span></td>

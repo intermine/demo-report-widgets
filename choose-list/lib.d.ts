@@ -1,5 +1,13 @@
 // jQuery.
-declare var $: any;
+interface JQuery {
+    html(JQuery): JQuery
+}
+interface JQueryStatic {
+    (): JQuery;
+    (selector: string, context?: any): JQuery;
+}
+declare var jQuery: JQueryStatic;
+declare var $: JQueryStatic;
 
 // Underscore.
 declare var _: any;

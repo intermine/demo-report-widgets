@@ -43,5 +43,25 @@ module.exports = {
                 "depends": [ "jQuery" ]
             }
         }
+    },
+    // Example config.
+    "config": {
+        // Pass the following to the App from the client.
+        'mine': 'http://beta.flymine.org/beta', // which mine to connect to
+        'token': 'X133AbT7J0Z0HfV316Q4', // token so we can access private lists
+        // Provided input, if any.
+        'provided': {
+            'list': 'My list', // a name of the list that is to be "highlighted"
+            'hidden': [ 'api' ] // hide lists tagged with this label
+        },
+        // A callback called at least once.
+        cb: function(err, working, list) {
+            // Has error happened?
+            if (err) throw err;
+            // Are you working?
+            console.log('working:', working);
+            // Are you done? Dump the list then.
+            console.log('list:', query);
+        }
     }
 }
