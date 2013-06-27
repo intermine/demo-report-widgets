@@ -3,6 +3,26 @@ interface EcoTemplate {
     (context?: any): string;
 }
 
+// Hogan templates.
+interface HoganTemplate {
+    render(context: any): string;
+}
+interface Hogan {
+    Template: HoganTemplate;
+    compile(template: string): HoganTemplate;
+}
+declare var Hogan: Hogan;
+
+// Underscore.
+declare module _ {
+    interface ObjectIterator {
+        (element: any, key: string, list: any): any;
+    }
+
+    export function object(keys: any[], values: any[]): any;
+    export function map(object: any, iterator: ObjectIterator): any[];
+}
+
 // imjs.
 interface Promise {}
 declare module intermine {
@@ -39,6 +59,7 @@ interface AsyncResultsCallback {
     (err: string, results?: any): void;
 }
 interface Async {
+    each(arr: any[], iterator: Function, cb: AsyncResultsCallback): void;
     waterfall(tasks: any[], cb: AsyncResultsCallback): void;
 }
 declare var async: Async;
@@ -47,17 +68,24 @@ declare var async: Async;
 interface JQuery {
     html(JQuery): JQuery
     find(selector: string): JQuery;
+    each(func: (index: any, elem: Element) => any): JQuery;
+    append(content: any): JQuery;
+}
+interface JQueryAjaxSettings {
+    url: string;
+    dataType?: string;
+    error?: (jqXHR: XMLHttpRequest, textStatus: string, errorThrow: string) => void;
+    success?: (data: any, textStatus: string, jqXHR: XMLHttpRequest) => void;
 }
 interface JQueryStatic {
     (): JQuery;
     (element: HTMLElement): JQuery;
     (selector: string, context?: any): JQuery;
+    getScript(url: string, success?: any): XMLHttpRequest;
+    ajax(settings: JQueryAjaxSettings): XMLHttpRequest;
 }
 declare var jQuery: JQueryStatic;
 declare var $: JQueryStatic;
-
-// Underscore.
-declare var _: any;
 
 // Backbone 1.0.0.
 declare module Backbone {

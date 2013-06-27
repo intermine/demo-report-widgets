@@ -1,20 +1,47 @@
 ///<reference path="lib.d.ts" />
 
+// Single row Model.
+class List extends Backbone.Model {
+
+    // Convert InterMine List into Backbone List.
+    public static convert(list: intermine.List): List {
+        // Store em here.
+        var obj: any = {};
+        // We want these.
+        [ 'dateCreated', 'description', 'name', 'size', 'status', 'tags', 'type' ].forEach(function(key: string) {
+            switch (key) {
+                case "dateCreated":
+                    list[key] = +new Date(list[key]);
+                default:
+                    obj[key] = list[key];
+            }
+        });
+        // Init.
+        return new List(obj);
+    }
+
+}
+
 // A single row with our list.
 class Row extends Backbone.View {
 
-    // Render into table rows.
-    tagName: string;
+    private template: EcoTemplate;
+    private model: Backbone.Model;
 
-    constructor(private opts: any) {
-        super();
-
+    constructor(opts: any) {
         this.tagName = "tr";
+
+        // Expand on us.
+        for (var key in opts) {
+            this[key] = opts[key];
+        }
+
+        super();
     }
 
     render(): Row {
         // Render our template.
-        $(this.el).html(this.opts.template({}));
+        $(this.el).html(this.template(this.model.toJSON()));
 
         // Chain.
         return this;
@@ -61,12 +88,12 @@ class Table extends Backbone.View {
                 // new View.
                 var row: Row = new Row({
                     // Lose the fns.
-                    model: <Object> JSON.stringify(list),
+                    model: List.convert(list),
                     // Pass in our template.
                     template: <EcoTemplate> self.opts.templates['row']
                 });
                 // Render into table.
-                tbody.html(row.render().el);
+                tbody.append(row.render().el);
                 // Push to stack.
                 self.rows.push(row);
             });
