@@ -41,6 +41,9 @@ module.exports = {
             "Foundation": {
                 "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.js",
                 "depends": [ "jQuery" ]
+            },
+            "Hogan": {
+                "path": "http://cdn.intermine.org/js/hogan.js/2.0.0/hogan.js"
             }
         }
     },

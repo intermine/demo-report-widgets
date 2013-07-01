@@ -25,7 +25,7 @@ class List extends Backbone.Model {
 // A single row with our list.
 class Row extends Backbone.View {
 
-    private template: EcoTemplate;
+    private template: Hogan.Template;
     private model: Backbone.Model;
 
     constructor(opts: any) {
@@ -41,7 +41,7 @@ class Row extends Backbone.View {
 
     render(): Row {
         // Render our template.
-        $(this.el).html(this.template(this.model.toJSON()));
+        $(this.el).html(this.template.render(this.model.toJSON()));
 
         // Chain.
         return this;
@@ -72,8 +72,8 @@ class Table extends Backbone.View {
     render(): Table {
         var self: any = this;
 
-        // Render the template with data.
-        $(this.el).html((<EcoTemplate> this.opts.templates['table'])());
+        // Render the template.
+        $(this.el).html(this.opts.templates['table'].render({}));
 
         // Get the user's lists.
         async.waterfall([ function(cb: Function) {
@@ -90,7 +90,7 @@ class Table extends Backbone.View {
                     // Lose the fns.
                     model: List.convert(list),
                     // Pass in our template.
-                    template: <EcoTemplate> self.opts.templates['row']
+                    template: self.opts.templates['row']
                 });
                 // Render into table.
                 tbody.append(row.render().el);
@@ -119,7 +119,8 @@ class App {
             cb(err: Error, working: bool, list: any): void
         },
         private templates: {
-            table: EcoTemplate
+            table: string
+            row: string
         }
     ) {
         // Make sure we have something to call to.
@@ -128,6 +129,11 @@ class App {
             this.config.cb = function(err: Error, working: bool, list: any) {
                 throw 'Provide your own `cb` function';
             }
+        }
+
+        // Hoganize.
+        for (var key in this.templates) {
+            this.templates[key] = new Hogan.Template(templates[key]);
         }
         
     }

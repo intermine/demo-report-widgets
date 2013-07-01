@@ -4,14 +4,12 @@ interface EcoTemplate {
 }
 
 // Hogan templates.
-interface HoganTemplate {
-    render(context: any): string;
+declare module Hogan {
+    export class Template {
+        constructor (precompiled: string);
+        render(context: any): string;
+    }
 }
-interface Hogan {
-    Template: HoganTemplate;
-    compile(template: string): HoganTemplate;
-}
-declare var Hogan: Hogan;
 
 // Underscore.
 declare module _ {
