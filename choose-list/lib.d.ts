@@ -11,6 +11,15 @@ declare module Hogan {
     }
 }
 
+// Moment.
+interface Moment {
+    fromNow(): string;
+}
+interface MomentStatic {
+    (date: Date): Moment;
+}
+declare var moment: MomentStatic;
+
 // Underscore.
 declare module _ {
     interface ObjectIterator {

@@ -43,7 +43,10 @@ module.exports = {
                 "depends": [ "jQuery" ]
             },
             "Hogan": {
-                "path": "http://cdn.intermine.org/js/hogan.js/2.0.0/hogan.js"
+                "path": "http://cdn.intermine.org/js/hogan.js/2.0.0/hogan.min.js"
+            },
+            "moment": {
+                "path": "http://cdn.intermine.org/js/moment.js/2.0.0/moment.min.js"
             }
         }
     },

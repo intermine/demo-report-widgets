@@ -5,4 +5,4 @@
     <span class="description">{{description}}</span>
 </td>
 <td><span class="owner"></span></td>
-<td><span class="created">{{dateCreated}}</span></td>
+<td><span class="created" title="{{dateCreated}}">{{timeAgo}}</span></td>

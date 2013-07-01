@@ -10,8 +10,9 @@ class List extends Backbone.Model {
         // We want these.
         [ 'dateCreated', 'description', 'name', 'size', 'status', 'tags', 'type' ].forEach(function(key: string) {
             switch (key) {
+                // Make into Date object.
                 case "dateCreated":
-                    list[key] = +new Date(list[key]);
+                    list[key] = new Date(list[key]);
                 default:
                     obj[key] = list[key];
             }
@@ -40,8 +41,13 @@ class Row extends Backbone.View {
     }
 
     render(): Row {
+        // Get them data.
+        var data: any = this.model.toJSON();
+        // Boost with time ago.
+        data.timeAgo = moment(<Date> data.dateCreated).fromNow();
+
         // Render our template.
-        $(this.el).html(this.template.render(this.model.toJSON()));
+        $(this.el).html(this.template.render(data));
 
         // Chain.
         return this;
