@@ -3,5 +3,23 @@ div[data-view="tags"]
         list-style-type: none
         margin: 0
 
-    span.label
-        cursor: pointer
+        li
+            cursor: pointer
+
+            span.color
+                width: 12px
+                height: 12px
+                border-radius: 50%
+                display: block
+                float: left
+                margin: 5px 5px 0 0
+
+            &:not(.active)
+                span.color:after
+                    content: ""
+                    width: 8px
+                    height: 8px
+                    border-radius: 50%
+                    display: block
+                    background: #FFF
+                    margin: 2px

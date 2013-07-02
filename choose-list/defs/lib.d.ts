@@ -20,17 +20,6 @@ interface MomentStatic {
 }
 declare var moment: MomentStatic;
 
-// Underscore.
-declare module _ {
-    interface ObjectIterator {
-        (element: any, key: string, list: any): any;
-    }
-
-    export function object(keys: any[], values: any[]): any;
-    export function map(object: any, iterator: ObjectIterator): any[];
-    export function difference(array: any[], ...others: any[]): any[];
-}
-
 // md5.
 declare function md5(input: string): string;
 
@@ -59,7 +48,7 @@ declare module intermine {
         constructor (opts: {
             root: string
             token: string
-            errorHandler(): void
+            errorHandler: Function
         });
         fetchLists(cb: (lists: intermine.List[]) => void ): Promise;
     }
@@ -74,29 +63,6 @@ interface Async {
     waterfall(tasks: any[], cb: AsyncResultsCallback): void;
 }
 declare var async: Async;
-
-// jQuery.
-interface JQuery {
-    html(JQuery): JQuery
-    find(selector: string): JQuery;
-    each(func: (index: any, elem: Element) => any): JQuery;
-    append(content: any): JQuery;
-}
-interface JQueryAjaxSettings {
-    url: string;
-    dataType?: string;
-    error?: (jqXHR: XMLHttpRequest, textStatus: string, errorThrow: string) => void;
-    success?: (data: any, textStatus: string, jqXHR: XMLHttpRequest) => void;
-}
-interface JQueryStatic {
-    (): JQuery;
-    (element: HTMLElement): JQuery;
-    (selector: string, context?: any): JQuery;
-    getScript(url: string, success?: any): XMLHttpRequest;
-    ajax(settings: JQueryAjaxSettings): XMLHttpRequest;
-}
-declare var jQuery: JQueryStatic;
-declare var $: JQueryStatic;
 
 // Backbone 1.0.0.
 declare module Backbone {
@@ -162,6 +128,10 @@ declare module Backbone {
         clone(): Collection;
         fetch(opts?: any): void;
         create(attrs: any, opts?: any): Collection;
+
+        // from Underscore.
+        find(iterator: (element: Model, index: number) => bool, context?: any): Model;
+        forEach(iterator: (element: Model, index: number, list?: any) => void , context?: any);
     }
     export class View {
         constructor (opts?);

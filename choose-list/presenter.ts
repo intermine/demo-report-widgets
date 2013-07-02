@@ -1,14 +1,6 @@
-///<reference path="lib.d.ts" />
-
-// return a color for a string.
-var colorize = function(text: string) {
-    var hash = md5(text);
-    return [
-        parseInt(hash.slice(0, 2), 16),
-        parseInt(hash.slice(1, 3), 16),
-        parseInt(hash.slice(2, 4), 16)
-    ];
-};
+/// <reference path="defs/jquery.d.ts" />
+/// <reference path="defs/underscore.d.ts" />
+/// <reference path="defs/lib.d.ts" />
 
 // All the tags, coming from Lists.
 class Tags extends Backbone.Collection {
@@ -21,38 +13,70 @@ class Tags extends Backbone.Collection {
         return collection.get('count');
     }
 
-    // Find if we have new tags and add them if so.
-    boost(tags: string[]): void {
-        var self: Tags = this;
-        // For all the possibly new tags.
-        tags.forEach(function(tag: string) {
-            var existing: Tag;
-            // Do we have it?
-            if (existing = <Tag> self.get(tag)) {
-                // +1.
-                existing.set('count', existing.get('count'));
-            } else {
-                // Create a new one then. With color.
-                self.add({ id: tag, rgb: colorize(tag) });
-            }
-        });
+    // Add a new tag or increase count.
+    add(obj: any): void {
+        // Do we have it?
+        var tag: Tag;
+        if (tag = <Tag> this.find(function(item: Tag) {
+            return item.name == obj.name;
+        })) {
+            tag.count += 1;
+        } else {
+            tag = new Tag(obj);
+            Backbone.Collection.prototype.add.call(this, tag);
+        }
     }
 
 }
 
-// One tag.
-class Tag extends Backbone.Model {
+interface TagInterface {
+    name: string; // tag name, not using internal id!
+    count: number; // how many times used
+    active: bool; // actively selected in UI?
+    rgb: number[]; // colorized string
+}
 
-    defaults() {
-        return {
-            count: 1, // well there is us
-            active: true // and by default we are selected
-        }
+// One tag.
+class Tag extends Backbone.Model implements TagInterface {
+
+    get name(): string       { return this.get('name'); }
+    set name(value: string)  { this.set('name', value); }
+    set count(value: number) { this.set('count', value); }
+    get count(): number      { return this.get('count'); }
+    set active(value: bool)  { this.set('active', value); }
+    get active(): bool       { return this.get('active'); }
+    set rgb(value: number[]) { this.set('rgb', value); }
+    get rgb(): number[]      { return this.get('rgb'); }
+
+    constructor(obj: TagInterface) {
+        super();
+
+        // Set the name from the incoming object.
+        this.name = obj.name;
+
+        // Say you are active.
+        this.active = true;
+
+        // Init count.
+        this.count = 1;
+
+        // Colorize.
+        this.rgb = Tag.colorize(obj.name);
     }
 
-    // Increment the count (frequency of usage).
-    public increment(): void {
-        this.set('count', this.get('count') + 1);
+    // Boost JSONification with our internal id.
+    public toJSON(): any {
+        return _.extend(Backbone.Model.prototype.toJSON.call(this), { id: this.cid });
+    }
+
+    // Return a color for a string.
+    private static colorize(text: string): number[] {
+        var hash = md5(text);
+        return [
+            parseInt(hash.slice(0, 2), 16),
+            parseInt(hash.slice(1, 3), 16),
+            parseInt(hash.slice(2, 4), 16)
+        ];
     }
 
 }
@@ -134,25 +158,47 @@ class TagsView extends Backbone.View {
 
     private collection: Tags;
     private template: Hogan.Template;
+    private events: any;
 
     // Save some things on us.
     constructor(opts: {
         collection: Tags
         template: Hogan.Template
     }) {
+        // The DOM events.
+        this.events = {
+            'click li': 'toggleTag'
+        };
+
         super(opts);
 
         this.template = opts.template;
     }
 
     render(): TagsView {
-        console.log(JSON.stringify(this.collection.toJSON()));
-
         // Render the whole collection in one template.
         $(this.el).html(this.template.render({ tags: this.collection.toJSON() }));
 
         // Chain.
         return this;
+    }
+
+    // Toggle the state of one tag.
+    toggleTag(evt: Event) {
+        // Get the id of the Model in question.
+        var id: string = $(evt.target).closest('li').data('model');
+
+        // Toggle it.
+        this.collection.find(function(tag: Tag): bool {
+            if (tag.cid == id) {
+                tag.active = !tag.active;
+                return true;
+            }
+            return false;
+        });
+
+        // Re-render.
+        this.render();
     }
 
 }
@@ -161,91 +207,70 @@ class TagsView extends Backbone.View {
 class TableView extends Backbone.View {
 
     private rows: Row[]; // List Row views
-    private tags: Tags; // a View of Tags
-    private service: any; // imjs thing
+    private tags: TagsView; // a View of Tags
+    private collection: Lists; // all them lists, nicely attached here
 
     constructor(private opts: any) {
-        super();
+        super(opts);
 
         this.rows = [];
-
-        // Pass these opts onward.
-        var imjs: any = {
-            root: this.opts.config.mine,
-            token: this.opts.config.token,
-            errorHandler: this.opts.config.cb
-        };
-
-        // Create a new Service connection.
-        this.service = new intermine.Service(imjs);
     }
 
     render(): TableView {
-        var self: any = this;
-
         // Render the template.
         $(this.el).html(this.opts.templates['table'].render({}));
 
-        // Get the user's lists.
-        async.waterfall([ function(cb: Function) {
-            self.service.fetchLists(function(lists: intermine.List[]) {
-                cb(null, lists);
-            });
+        // Render the table body.
+        this.renderTbody();
 
-            // Render a row per our list.
-        }, function(data: any[], cb: Function) {
-            // Create a fragment for rendering all lists.
-            var fragment = document.createDocumentFragment();
-
-            // For each list...
-            data.forEach(function(item: intermine.List) {
-                // Modelify.
-                var list: List = new List(item);
-
-                // Push to the stack.
-                lists.push(list);
-
-                // Any new tags? Boost them.
-                tags.boost(list.get('tags'));
-
-                // New View.
-                var row: Row = new Row({
-                    // Lose the fns.
-                    model: list,
-                    // Pass in our template.
-                    template: self.opts.templates['row']
-                });
-                // Push to stack.
-                self.rows.push(row);
-                // Append the child.
-                fragment.appendChild(row.render().el);
-            });
-
-            // Render all them lists into table body.
-            $(self.el).find('tbody[data-view="rows"]').html(fragment);
-
-            // Render them tags.
-            self.tags = new TagsView({ collection: tags, template: self.opts.templates['tags'] });
-            $(self.el).find('div[data-view="tags"]').html(self.tags.render().el);
-
-        }], function(err: string) {
-            if (err) {
-                self.opts.config.cb(new Error(err), false, null);
-                return;
-            }
+        // Render them tags.
+        this.tags = new TagsView({
+            collection: tags,
+            template: this.opts.templates['tags']
         });
+        $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
 
         // Chain.
         return this;
+    }
+
+    // Just re-render lists, properly.
+    private renderTbody(): void {
+        var self: TableView = this;
+
+        // Create a fragment for rendering all lists.
+        var fragment = document.createDocumentFragment();
+
+        // For each list...
+        this.collection.forEach(function(list: List) {
+            // New View.
+            var row: Row = new Row({
+                model: list,
+                template: self.opts.templates['row']
+            });
+            // Push to stack.
+            self.rows.push(row);
+            // Append the child.
+            fragment.appendChild(row.render().el);
+        });
+
+        // Render all them lists into table body.
+        $(this.el).find('tbody[data-view="rows"]').html(fragment);
     }
 
 }
 
 class App {
 
+    public config: any;
+    private service: intermine.Service;
+    private cb: Function;
+
     // Enforce callback and templates.
     constructor(
-        private config: {
+        config: {
+            mine: string
+            token: string
             cb(err: Error, working: bool, list: any): void
         },
         private templates: {
@@ -254,28 +279,66 @@ class App {
             tags: string // all them tags
         }
     ) {
-        // Make sure we have something to call to.
-        if (this.config.cb == null || typeof(this.config.cb) !== 'function') {
-            // Throw up the first chance we get.
-            this.config.cb = function(err: Error, working: bool, list: any) {
-                throw 'Provide your own `cb` function';
-            }
-        }
+        // Make sure we have something to call to. Something throw-y.
+        this.cb = (config.cb == null || typeof(config.cb) !== 'function') ? function(
+            err: Error, working: bool, list: any
+        ) {
+            throw 'Provide your own `cb` function';
+        } : config.cb;
 
-        // Hoganize.
+        if (!config.mine) { this.cb('Missing `mine` value in config', null, null); return; }
+        if (!config.token) { this.cb('Missing `token` value in config', null, null); return; }
+
+        // Save it.
+        this.config = config;
+
+        // Create a new Service connection.
+        this.service = new intermine.Service({
+            root: config.mine,
+            token: config.token,
+            errorHandler: this.cb
+        });
+
+        // Have some Hogan in you.
         for (var key in this.templates) {
             this.templates[key] = new Hogan.Template(templates[key]);
         }
-        
     }
 
     render(target: string): void {
-        // Work starts here.
-        this.config.cb(null, true, null);
+        var self: App = this;
 
-        // Construct a new View and dump it to the target.
-        var table: Backbone.View = new TableView({ config: this.config, templates: this.templates });
-        $(target).html(table.render().el);
+        // Work starts here.
+        this.cb(null, true, null);
+
+        // Get the user's lists.
+        this.service.fetchLists(function(data: intermine.List[]) {
+            // For each list...
+            data.forEach(function(item: intermine.List) {
+                // Modelify.
+                var list: List = new List(item);
+
+                // Push to the collection.
+                lists.push(list);
+
+                // Any new tags?
+                list.get('tags').forEach(function(tag: string) {
+                    // Add them to their collection.
+                    tags.add({ name: tag });
+                });
+            });
+
+            // Construct a new View and dump it to the target.
+            var table: Backbone.View = new TableView({
+                collection: lists,
+                config: self.config,
+                templates: self.templates
+            });
+            $(target).html(table.render().el);
+
+            // No more work.
+            self.cb(null, false, null);
+        });
     }
 
 }

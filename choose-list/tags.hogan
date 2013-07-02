@@ -1,14 +1,9 @@
 <div class="select">Select <span class="all">all</span>/<span class="none">none</span></div>
-<ul>
+<ul class="side-nav">
 {{#tags}}
-    <!-- active tag? -->
-    {{#active}}
-        <li><span class="radius label" style="background-color:rgb({{rgb}})">{{id}}</span></li>
-    {{/active}}
-
-    <!-- not an active tag :( -->
-    {{^active}}
-        <li><span class="radius label" style="background-color:rgba({{rgb}}, 0.5)">{{id}}</span></li>
-    {{/active}}
+    <li class="{{#active}}active{{/active}}" data-model="{{id}}">
+        <span class="color" style="background-color:rgb({{rgb}})"></span>
+        <a>{{name}}</a>
+    </li>
 {{/tags}}
 </ul>
