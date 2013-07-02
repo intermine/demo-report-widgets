@@ -47,6 +47,9 @@ module.exports = {
             },
             "moment": {
                 "path": "http://cdn.intermine.org/js/moment.js/2.0.0/moment.min.js"
+            },
+            "md5": {
+                "path": "http://cdn.intermine.org/js/md5/2.2/md5.min.js"
             }
         }
     },

@@ -28,7 +28,11 @@ declare module _ {
 
     export function object(keys: any[], values: any[]): any;
     export function map(object: any, iterator: ObjectIterator): any[];
+    export function difference(array: any[], ...others: any[]): any[];
 }
+
+// md5.
+declare function md5(input: string): string;
 
 // imjs.
 interface Promise {}
@@ -110,7 +114,7 @@ declare module Backbone {
         cid: string;
         attributes: any;
         changed: any;
-        defaults: any;
+        defaults(opts?: any): any;
         toJSON(): any;
         sync(method: string, model: Model, opts?: any): void;
         fetch(opts?: any): void;
@@ -141,13 +145,14 @@ declare module Backbone {
         set(models: any, opts?: any): void;
         get(id: string): Model;
         at(index: number): Model;
-        push(model: Model, opts?: any): void;
+        push(model: any, opts?: any): void;
         pop(opts?: any): Model;
         unshift(model: Model, opts?: any): Model;
         shift(opts?: any): Model;
         slice(begin: number, end: number): Model[];
         length: number;
-        comparator: any;
+        comparator(element: any): any;
+        comparator(compare: any, to?: any): any;
         sort(opts?: any): void;
         pluck(attr): any[];
         where(attrs): Model[];

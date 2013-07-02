@@ -4,13 +4,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="large-4 columns">
-        <ul>
-            <li><span class="radius secondary label">Tag #1</span></li>
-            <li><span class="radius secondary label">Tag #2</span></li>
-            <li><span class="radius secondary label">Tag #3</span></li>
-        </ul>
-    </div>
+    <div class="large-4 columns" data-view="tags"></div>
     <div class="large-8 columns">
         <table>
             <thead>
@@ -22,9 +16,7 @@
                     <th>Created</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- row.hogan -->
-            </tbody>
+            <tbody data-view="rows"></tbody>
         </table>
     </div>
 </div>
