@@ -167,9 +167,6 @@ class Row extends Backbone.View {
         }
 
         super();
-
-        // Listen to tag collection active attr changes..
-        tags.bind('change:active', this.toggle, this);
     }
 
     render(): Row {
@@ -184,22 +181,6 @@ class Row extends Backbone.View {
 
         // Chain.
         return this;
-    }
-
-    // Show or hide this row when our tag (if any) is active or not.
-    private toggle(): void {
-        var list: List = <List> this.model;
-        // Not involved?
-        if (!list.tags.length) return;
-
-        // Are all our tags active?
-        var active: string[] = tags.getActiveNames();
-        // noinspection JSUnresolvedFunction
-        if (_(list.tags).difference(active).length == list.tags.length) {
-            $(this.el).hide();
-        } else {
-            $(this.el).show();
-        }
     }
 
 }
@@ -281,6 +262,9 @@ class TableView extends Backbone.View {
         });
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
 
+        // Now listen to tag collection active attr changes..
+        tags.bind('change', this.renderTbody, this);
+
         // Chain.
         return this;
     }
@@ -289,11 +273,18 @@ class TableView extends Backbone.View {
     private renderTbody(): void {
         var self: TableView = this;
 
+        // Get active tags.
+        var active: string[] = tags.getActiveNames();
+
         // Create a fragment for rendering all lists.
         var fragment = document.createDocumentFragment();
 
         // For each list...
         this.collection.forEach(function(list: List) {
+            // Do not create View if our tags do not match the active ones.
+            // noinspection JSUnresolvedFunction
+            if (list.tags.length !== 0 && _(list.tags).difference(active).length == list.tags.length) return;
+
             // New View.
             var row: Row = new Row({
                 model: list,
