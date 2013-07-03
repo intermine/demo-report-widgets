@@ -2,86 +2,6 @@
 /// <reference path="defs/underscore.d.ts" />
 /// <reference path="defs/lib.d.ts" />
 
-// All the tags, coming from Lists.
-class Tags extends Backbone.Collection {
-
-    model: Tag;
-
-    // Add a new tag or increase count.
-    add(obj: any): void {
-        // Do we have it?
-        var tag: Tag;
-        if (tag = <Tag> this.find(function(item: Tag) {
-            return item.name == obj.name;
-        })) {
-            tag.count += 1;
-        } else {
-            tag = new Tag(obj);
-            Backbone.Collection.prototype.add.call(this, tag);
-        }
-    }
-
-    // Filter the Models down to a list of names where Model is active.
-    getActiveNames(): string[] {
-        return _(this.filter(function(tag: Tag) {
-            return tag.active;
-        })).pluck('name');
-    }
-
-}
-
-interface TagInterface {
-    name: string; // tag name, not using internal id!
-    count: number; // how many times used
-    active: bool; // actively selected in UI?
-    rgb: number[]; // colorized string
-}
-
-// One tag.
-class Tag extends Backbone.Model implements TagInterface {
-
-    get name(): string       { return this.get('name'); }
-    set name(value: string)  { this.set('name', value); }
-    set count(value: number) { this.set('count', value); }
-    get count(): number      { return this.get('count'); }
-    set active(value: bool)  { this.set('active', value); }
-    get active(): bool       { return this.get('active'); }
-    set rgb(value: number[]) { this.set('rgb', value); }
-    get rgb(): number[]      { return this.get('rgb'); }
-
-    constructor(obj: TagInterface) {
-        super();
-
-        // Set the name from the incoming object.
-        this.name = obj.name;
-
-        // Say you are active.
-        this.active = true;
-
-        // Init count.
-        this.count = 1;
-
-        // Colorize.
-        this.rgb = Tag.colorize(obj.name);
-    }
-
-    // Boost JSONification with our internal id.
-    public toJSON(): any {
-        return _.extend(Backbone.Model.prototype.toJSON.call(this), { id: this.cid });
-    }
-
-    // Return a color for a string.
-    private static colorize(text: string): number[] {
-        var hash = md5(text);
-        return [
-            parseInt(hash.slice(0, 2), 16),
-            parseInt(hash.slice(1, 3), 16),
-            parseInt(hash.slice(2, 4), 16)
-        ];
-    }
-
-}
-
 // Sort on column key providing direction (asc, desc).
 interface SortInterface {
     key: string;
@@ -148,6 +68,104 @@ class SortedCollection extends Backbone.Collection {
         this.eachCache.forEach(function(model: Backbone.Model, index: number, array: Backbone.Model[]) {
             cb(model, index, array);
         });
+    }
+
+    // Make sure we do not sort.
+    add(obj: any, opts?: any): void {
+        if (!opts) {
+            opts = { sort: false };
+        } else {
+            opts.sort = false;
+        }
+        // noinspection JSUnresolvedVariable
+        Backbone.Collection.prototype.add.call(this, obj, opts);
+    }
+
+}
+
+// All the tags, coming from Lists.
+class Tags extends SortedCollection {
+
+    model: Tag;
+
+    initialize() {
+        // By default sort on the count of lists with our tag.
+        this.sortOrder = { key: 'count', direction: 1 };
+    }
+
+    // Add a new tag or increase count.
+    add(obj: any): void {
+        // Do we have it?
+        var tag: Tag;
+        if (tag = <Tag> this.find(function(item: Tag) {
+            return item.name == obj.name;
+        })) {
+            tag.count += 1;
+        } else {
+            tag = new Tag(obj);
+            // noinspection JSUnresolvedVariable
+            SortedCollection.prototype.add.call(this, tag);
+            // Backbone.Collection.prototype.add.call(this, tag, { sort: false });
+        }
+    }
+
+    // Filter the Models down to a list of names where Model is active.
+    getActiveNames(): string[] {
+        return _(this.filter(function(tag: Tag) {
+            return tag.active;
+        })).pluck('name');
+    }
+
+}
+
+interface TagInterface {
+    name: string; // tag name, not using internal id!
+    count: number; // how many times used
+    active: bool; // actively selected in UI?
+    rgb: number[]; // colorized string
+}
+
+// One tag.
+class Tag extends Backbone.Model implements TagInterface {
+
+    get name(): string       { return this.get('name'); }
+    set name(value: string)  { this.set('name', value); }
+    set count(value: number) { this.set('count', value); }
+    get count(): number      { return this.get('count'); }
+    set active(value: bool)  { this.set('active', value); }
+    get active(): bool       { return this.get('active'); }
+    set rgb(value: number[]) { this.set('rgb', value); }
+    get rgb(): number[]      { return this.get('rgb'); }
+
+    constructor(obj: TagInterface) {
+        super();
+
+        // Set the name from the incoming object.
+        this.name = obj.name;
+
+        // Say you are active.
+        this.active = true;
+
+        // Init count.
+        this.count = 1;
+
+        // Colorize.
+        this.rgb = Tag.colorize(obj.name);
+    }
+
+    // Boost JSONification with our internal id.
+    public toJSON(): any {
+        return _.extend(Backbone.Model.prototype.toJSON.call(this), { id: this.cid });
+    }
+
+    // Return a color for a string.
+    private static colorize(text: string): number[] {
+        var hash = md5(text);
+        return [
+            parseInt(hash.slice(0, 2), 16),
+            parseInt(hash.slice(1, 3), 16),
+            parseInt(hash.slice(2, 4), 16)
+        ];
     }
 
 }
@@ -419,7 +437,7 @@ class App {
                 var list: List = new List(item);
 
                 // Add to the collection.
-                lists.add(list, { sort: false });
+                lists.add(list);
 
                 // Any new tags?
                 list.tags.forEach(function(tag: string) {
