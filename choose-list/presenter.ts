@@ -27,6 +27,13 @@ class Tags extends Backbone.Collection {
         }
     }
 
+    // Filter the Models down to a list of names where Model is active.
+    getActiveNames(): string[] {
+        return _(this.filter(function(tag: Tag) {
+            return tag.active;
+        })).pluck('name');
+    }
+
 }
 
 interface TagInterface {
@@ -182,10 +189,17 @@ class Row extends Backbone.View {
     // Show or hide this row when our tag (if any) is active or not.
     private toggle(): void {
         var list: List = <List> this.model;
-        // No tags means early bath.
-        if (!!list.tags.length) return;
+        // Not involved?
+        if (!list.tags.length) return;
 
-        // TODO: Are all our tags active?
+        // Are all our tags active?
+        var active: string[] = tags.getActiveNames();
+        // noinspection JSUnresolvedFunction
+        if (_(list.tags).difference(active).length == list.tags.length) {
+            $(this.el).hide();
+        } else {
+            $(this.el).show();
+        }
     }
 
 }
@@ -229,7 +243,7 @@ class TagsView extends Backbone.View {
         this.collection.find(function(tag: Tag): bool {
             if (tag.cid == id) {
                 tag.active = !tag.active;
-                return true;
+                return true; // do not search further
             }
             return false;
         });
@@ -359,7 +373,7 @@ class App {
                 lists.push(list);
 
                 // Any new tags?
-                list.get('tags').forEach(function(tag: string) {
+                list.tags.forEach(function(tag: string) {
                     // Add them to their collection.
                     tags.add({ name: tag });
                 });
