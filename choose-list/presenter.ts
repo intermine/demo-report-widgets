@@ -7,12 +7,6 @@ class Tags extends Backbone.Collection {
 
     model: Tag;
 
-    // Sort tags on their usage count.
-    // Comparator for sort function on custom column/key.
-    comparator(collection: Tags) {
-        return collection.get('count');
-    }
-
     // Add a new tag or increase count.
     add(obj: any): void {
         // Do we have it?
@@ -88,20 +82,84 @@ class Tag extends Backbone.Model implements TagInterface {
 
 }
 
+// Sort on column key providing direction (asc, desc).
+interface SortInterface {
+    key: string;
+    direction: number
+}
+
+interface ForEachCallback {
+    (value: Backbone.Model, index: number, array: Backbone.Model[])
+}
+
+class SortedCollection extends Backbone.Collection {
+
+    get sortOrder(): SortInterface      { return this._sortOrder; }
+    set sortOrder(value: SortInterface) {
+        // Is it different from the previous one?
+        if (!_(this.sortOrder).isEqual(<any> value)) {
+            // Set it.
+            this._sortOrder = value;
+            // Discard each cache.
+            this.eachCache = null;
+        }
+    }
+
+    private eachCache: Backbone.Model[]; // caches the results of a sort for this sort order
+    private _sortOrder: SortInterface; // privately stored here
+
+    // Use custom sort column and order on standard `each`.
+    forEach(cb: ForEachCallback): void {
+        var self: SortedCollection = this;
+
+        // No cache?
+        if (!this.eachCache) {
+            // Sort & save then.
+            this.eachCache = (<List[]> this.models).sort(function(a: List, b: List): number {
+                // Get the keys.
+                var keyA = a[self.sortOrder.key],
+                    keyB = b[self.sortOrder.key];
+
+                if (typeof(keyA) !== typeof(keyB)) {
+                    throw 'Key value types do not match'
+                }
+
+                // Based on the type of the object...
+                switch (typeof(keyA)) {
+                    case 'string':
+                        return self.sortOrder.direction * keyA.localeCompare(keyB);
+                        break;
+                    case 'number':
+                        return self.sortOrder.direction * (keyA - keyB);
+                        break;
+                    case 'object':
+                        // Hope it is a Date.
+                        if (keyA instanceof Date) {
+                            return self.sortOrder.direction * (+keyA - +keyB)
+                            break;
+                        }
+                    default:
+                        throw 'Do not know how to sort on key `' + self.sortOrder.key + '`';
+                }
+            });
+        }
+
+        // The callback is the same.
+        this.eachCache.forEach(function(model: Backbone.Model, index: number, array: Backbone.Model[]) {
+            cb(model, index, array);
+        });
+    }
+
+}
+
 // All the lists.
-class Lists extends Backbone.Collection {
+class Lists extends SortedCollection {
 
     model: List;
-    public sortColumn: string; // sort on a string key
 
     initialize() {
         // By default sort on the date key.
-        this.sortColumn = 'dateCreated';
-    }
-
-    // Comparator for sort function on custom column/key.
-    comparator(collection: Lists) {
-        return collection.get(this.sortColumn);
+        this.sortOrder = { key: 'dateCreated', direction: -1 };
     }
 
 }
@@ -360,8 +418,8 @@ class App {
                 // Modelify.
                 var list: List = new List(item);
 
-                // Push to the collection.
-                lists.push(list);
+                // Add to the collection.
+                lists.add(list, { sort: false });
 
                 // Any new tags?
                 list.tags.forEach(function(tag: string) {

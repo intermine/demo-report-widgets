@@ -102,7 +102,7 @@ declare module Backbone {
     export class Collection {
         constructor (models?, opts?);
         model: any;
-        models(): any[];
+        models: any[];
         toJSON(): any;
         sync(method: string, collection: any, opts?: any): void;
         add(models: any, opts?: any): void;
@@ -119,7 +119,7 @@ declare module Backbone {
         length: number;
         comparator(element: any): any;
         comparator(compare: any, to?: any): any;
-        sort(opts?: any): void;
+        sort(opts?: any): any;
         pluck(attr): any[];
         where(attrs): Model[];
         findWhere(attrs): Model;
@@ -132,6 +132,7 @@ declare module Backbone {
         // from Underscore.
         find(iterator: (element: Model, index: number) => bool, context?: any): Model;
         forEach(iterator: (element: Model, index: number, list?: any) => void , context?: any);
+        each(iterator: (element: Model, index: number, list?: any) => void , context?: any);
         filter(iterator: (element: Model, index: number) => bool, context?: any): Model[];
 
         // Events.
