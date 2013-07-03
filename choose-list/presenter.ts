@@ -94,7 +94,7 @@ class Tags extends SortedCollection {
     }
 
     // Add a new tag or increase count.
-    add(obj: any): void {
+    add(obj: any): Tag {
         // Do we have it?
         var tag: Tag;
         if (tag = <Tag> this.find(function(item: Tag) {
@@ -107,6 +107,8 @@ class Tags extends SortedCollection {
             SortedCollection.prototype.add.call(this, tag);
             // Backbone.Collection.prototype.add.call(this, tag, { sort: false });
         }
+
+        return tag;
     }
 
     // Filter the Models down to a list of names where Model is active.
@@ -155,6 +157,7 @@ class Tag extends Backbone.Model implements TagInterface {
 
     // Boost JSONification with our internal id.
     public toJSON(): any {
+        // noinspection JSUnresolvedVariable
         return _.extend(Backbone.Model.prototype.toJSON.call(this), { id: this.cid });
     }
 
@@ -220,6 +223,15 @@ class List extends Backbone.Model implements ListInterface {
                 this[key] = list[key];
             }
         }
+
+        // Make into nice refs.
+        this.tags.forEach((name: string, index: number) => {
+            // Will add or increase count.
+            var tag: Tag = tags.add({ name: name });
+            // Either way, we will ref it like this.
+            this.tags[index] = tag.cid;
+        });
+
     }
 
 }
@@ -436,14 +448,8 @@ class App {
                 // Modelify.
                 var list: List = new List(item);
 
-                // Add to the collection.
+                // Add to the collection. Will add to tags behind the scenes too
                 lists.add(list);
-
-                // Any new tags?
-                list.tags.forEach(function(tag: string) {
-                    // Add them to their collection.
-                    tags.add({ name: tag });
-                });
             });
 
             // Construct a new View and dump it to the target.
