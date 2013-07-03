@@ -132,6 +132,9 @@ declare module Backbone {
         // from Underscore.
         find(iterator: (element: Model, index: number) => bool, context?: any): Model;
         forEach(iterator: (element: Model, index: number, list?: any) => void , context?: any);
+
+        // Events.
+        bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
     }
     export class View {
         constructor (opts?);

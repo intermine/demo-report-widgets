@@ -99,19 +99,44 @@ class Lists extends Backbone.Collection {
 
 }
 
+interface ListInterface {
+    dateCreated: number;
+    description: string;
+    name: string;
+    size: number;
+    status: string;
+    tags: string[];
+    type: string;
+}
+
 // Single row Model.
-class List extends Backbone.Model {
+class List extends Backbone.Model implements ListInterface {
 
+    get dateCreated(): number      { return this.get('dateCreated'); }
+    set dateCreated(value: number) { this.set('dateCreated', value); }
+    get description(): string      { return this.get('description'); }
+    set description(value: string) { this.set('description', value); }
+    get name(): string             { return this.get('name'); }
+    set name(value: string)        { this.set('name', value); }
+    get size(): number             { return this.get('size'); }
+    set size(value: number)        { this.set('size', value); }
+    get status(): string           { return this.get('status'); }
+    set status(value: string)      { this.set('status', value); }
+    get tags(): string[]           { return this.get('tags'); }
+    set tags(value: string[])      { this.set('tags', value); }
+    get type(): string             { return this.get('type'); }
+    set type(value: string)        { this.set('type', value); }
+
+    // Convert an intermine.List into a proper Model.
     constructor(list: intermine.List) {
-        // Store em here.
-        var obj: any = {};
-        // We want these.
-        [ 'dateCreated', 'description', 'name', 'size', 'status', 'tags', 'type' ].forEach(function(key: string) {
-            obj[key] = list[key];
-        });
+        super();
 
-        super(obj);
-
+        // Save them all, but only some will make it to our Model proper.
+        for (var key in list) {
+            if (key) {
+                this[key] = list[key];
+            }
+        }
     }
 
 }
@@ -135,6 +160,9 @@ class Row extends Backbone.View {
         }
 
         super();
+
+        // Listen to tag collection active attr changes..
+        tags.bind('change:active', this.toggle, this);
     }
 
     render(): Row {
@@ -149,6 +177,15 @@ class Row extends Backbone.View {
 
         // Chain.
         return this;
+    }
+
+    // Show or hide this row when our tag (if any) is active or not.
+    private toggle(): void {
+        var list: List = <List> this.model;
+        // No tags means early bath.
+        if (!!list.tags.length) return;
+
+        // TODO: Are all our tags active?
     }
 
 }
