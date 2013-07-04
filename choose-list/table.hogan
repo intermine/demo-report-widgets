@@ -10,10 +10,9 @@
             <thead>
                 <tr>
                     <th><span class="check-all"></span></th>
-                    <th></th>
-                    <th>Title</th>
+                    <th data-sort="title"><a>Title</a></th>
                     <th>Owner</th>
-                    <th>Created</th>
+                    <th data-sort="dateCreated"><a>Created</a></th>
                 </tr>
             </thead>
             <tbody data-view="rows"></tbody>

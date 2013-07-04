@@ -1,5 +1,4 @@
 <td><input type="checkbox" /></td>
-<td><span class="star"></span></td>
 <td>
     <ul class="tags">
         {{#tags}}

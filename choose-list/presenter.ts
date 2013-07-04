@@ -16,10 +16,16 @@ class SortedCollection extends Backbone.Collection {
 
     get sortOrder(): SortInterface      { return this._sortOrder; }
     set sortOrder(value: SortInterface) {
+        // Init?
+        this._sortOrder = (this._sortOrder) ? this._sortOrder : <SortInterface> {};
+
         // Is it different from the previous one?
-        if (!_(this.sortOrder).isEqual(<any> value)) {
-            // Set it.
-            this._sortOrder = value;
+        if (!_(this._sortOrder).isEqual(<any> value)) {
+            // Set it, not by reference!
+            for (var key in value) {
+                if (typeof(value[key]) == 'object') throw 'Not cool!';
+                this._sortOrder[key] = value[key];
+            }
             // Discard each cache.
             this.eachCache = null;
         }
@@ -221,6 +227,7 @@ class List extends Backbone.Model implements ListInterface {
     }
     set tags(value: Tag[]) {
         // Actually save the Model ids only.
+        // Take care not to save the ref to Tag objects!
         this.set('tags', _.map(value, function(tag: Tag): string {
             return <string> tag.cid;
         }));
@@ -363,10 +370,22 @@ class TableView extends Backbone.View {
     private rows: Row[]; // List Row views
     private tags: TagsView; // a View of Tags
     private collection: Lists; // all them lists, nicely attached here
+    private events: any;
+    private opts: any; // not saving them straight from constructor as we need to attach events first
+    private sortOrder: SortInterface; // keep track of previous sort order to do direction
 
-    constructor(private opts: any) {
+    constructor(opts?: any) {
+        // The DOM events.
+        this.events = {
+            'click thead th[data-sort]': 'sortTable'
+        };
+
         super(opts);
 
+        // Now save 'em.
+        this.opts = opts;
+
+        // All row views.
         this.rows = [];
     }
 
@@ -420,6 +439,29 @@ class TableView extends Backbone.View {
 
         // Render all them lists into table body.
         $(this.el).find('tbody[data-view="rows"]').html(fragment);
+    }
+
+    // When we click on table heads.
+    private sortTable(ev: Event): void {
+        // Get the column key to sort on.
+        var key: string = $(ev.target).closest('th').data('sort');
+        // Have we sorted before on the same key?
+        if (this.sortOrder && this.sortOrder.key == key) {
+            // Just flip the order.
+            this.sortOrder.direction *= -1;
+        } else {
+            // Save new.
+            this.sortOrder = {
+                key: key,
+                direction: 1
+            };
+        }
+
+        // Magic setter.
+        this.collection.sortOrder = this.sortOrder;
+
+        // Render.
+        this.renderTbody();
     }
 
 }
