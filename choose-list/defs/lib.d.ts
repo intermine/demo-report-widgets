@@ -150,6 +150,8 @@ declare module Backbone {
         delegateEvents(events?: any): void;
         undelegateEvent(): void;
         tagName: string;
+        id: string;
+        cid: string;
     }
 
     // The relational bits.

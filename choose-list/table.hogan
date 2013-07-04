@@ -17,5 +17,7 @@
             </thead>
             <tbody data-view="rows"></tbody>
         </table>
+
+        <div class="pagination-centered" data-view="pagination"></div>
     </div>
 </div>

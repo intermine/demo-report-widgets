@@ -1,0 +1,11 @@
+<ul class="pagination">
+    <li class="arrow unavailable"><a>&laquo;</a></li>
+    <li class="current"><a href="">1</a></li>
+    <li><a>2</a></li>
+    <li><a>3</a></li>
+    <li><a>4</a></li>
+    <li class="unavailable"><a>&hellip;</a></li>
+    <li><a>12</a></li>
+    <li><a>13</a></li>
+    <li class="arrow"><a>&raquo;</a></li>
+</ul>

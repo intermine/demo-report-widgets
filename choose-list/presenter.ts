@@ -304,8 +304,62 @@ class List extends Backbone.Model implements ListInterface {
 var tags: Tags = new Tags();
 var lists: Lists = new Lists();
 
+// Just like Chaplin, be able to properly kill views.
+class DisposableView extends Backbone.View {
+
+    // Are we dead?
+    public disposed: bool;
+
+    constructor(opts?: any) {
+        super(opts);
+
+        // It is alive!
+        this.disposed = false;
+    }
+
+    // Call this with a list of Views.
+    public disposeOf(obj: any): void {
+        // Iterable? Pass each of this to us.
+        if (obj instanceof Array) {
+            obj.forEach(this.disposeOf);
+        } else {
+            // We better be able to dispose.
+            if ('dispose' in obj && typeof(<DisposableView> obj.dispose) == 'function') {
+                obj.dispose();
+            } else {
+                throw 'Cannot dispose of this object';
+            }
+        }
+    }
+
+    // Dispose of properly.
+    public dispose(): void {
+        // Not needed?
+        if (this.disposed) return;
+
+        // Use Backbone internal remove.
+        // this.undelegateEvents();
+        // this.stopListening();
+        this.remove();
+
+        // Delete properties on us.
+        [ 'el', '$el', 'options', 'opts', 'model', 'collection' ].forEach((property: string) => {
+            delete this[property];
+        });
+
+        // Say we are dead.
+        this.disposed = true;
+
+        // You are frozen when your heart is not open.
+        if (Object.freeze && typeof Object.freeze === 'function') {
+            Object.freeze(this);
+        }
+    }
+
+}
+
 // A single row with our list.
-class Row extends Backbone.View {
+class Row extends DisposableView {
 
     private model: Backbone.Model;
     private template: Hogan.Template;
@@ -416,8 +470,14 @@ class TagsView extends Backbone.View {
 
 }
 
+// Map of pagination properties.
+interface PaginatorInterface {
+    maxRows: number;
+    page: number;
+}
+
 // Complete table of all lists.
-class TableView extends Backbone.View {
+class TableView extends DisposableView {
 
     private rows: Row[]; // List Row views
     private tags: TagsView; // a View of Tags
@@ -425,6 +485,7 @@ class TableView extends Backbone.View {
     private events: any;
     private opts: any; // not saving them straight from constructor as we need to attach events first
     private sortOrder: SortInterface; // keep track of previous sort order to do direction
+    private paginator: PaginatorInterface;
 
     constructor(opts?: any) {
         // The DOM events.
@@ -439,6 +500,12 @@ class TableView extends Backbone.View {
 
         // All row views.
         this.rows = [];
+
+        // Init paginator.
+        this.paginator = {
+            maxRows: 10,
+            page: 1
+        };
     }
 
     render(): TableView {
@@ -446,7 +513,7 @@ class TableView extends Backbone.View {
         $(this.el).html(this.opts.templates['table'].render({}));
 
         // Render the table body.
-        this.renderTbody();
+        this.renderRows();
 
         // Render them tags.
         this.tags = new TagsView({
@@ -456,14 +523,14 @@ class TableView extends Backbone.View {
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
 
         // Now listen to tag collection active attr changes..
-        tags.bind('change', this.renderTbody, this);
+        tags.bind('change', this.renderRows, this);
 
         // Chain.
         return this;
     }
 
     // Just re-render lists, properly.
-    private renderTbody(): void {
+    private renderRows(): void {
         var self: TableView = this;
 
         // Get active tags.
@@ -471,6 +538,9 @@ class TableView extends Backbone.View {
 
         // Create a fragment for rendering all lists.
         var fragment = document.createDocumentFragment();
+
+        // Dispose of any previous rows.
+        this.disposeOf(this.rows);
 
         // For each list...
         this.collection.forEach(function(list: List) {
@@ -513,7 +583,7 @@ class TableView extends Backbone.View {
         this.collection.sortOrder = this.sortOrder;
 
         // Render.
-        this.renderTbody();
+        this.renderRows();
     }
 
 }
