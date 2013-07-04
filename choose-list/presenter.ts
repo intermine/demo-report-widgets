@@ -111,11 +111,11 @@ class Tags extends SortedCollection {
         return tag;
     }
 
-    // Filter the Models down to a list of names where Model is active.
-    getActiveNames(): string[] {
-        return _(this.filter(function(tag: Tag) {
+    // Filter the Models to active ones.
+    getActive(): any {
+        return _(this.filter(function(tag: Tag): bool {
             return tag.active;
-        })).pluck('name');
+        }));
     }
 
 }
@@ -191,7 +191,7 @@ interface ListInterface {
     name: string;
     size: number;
     status: string;
-    tags: string[];
+    tags: Tag[];
     type: string;
 }
 
@@ -208,10 +208,23 @@ class List extends Backbone.Model implements ListInterface {
     set size(value: number)        { this.set('size', value); }
     get status(): string           { return this.get('status'); }
     set status(value: string)      { this.set('status', value); }
-    get tags(): string[]           { return this.get('tags'); }
-    set tags(value: string[])      { this.set('tags', value); }
     get type(): string             { return this.get('type'); }
     set type(value: string)        { this.set('type', value); }
+
+    // Tags are a relation where we pass/get Tag objects but internally store only their ids.
+    get tags(): Tag[] {
+        // Convert internal list of strings into actual objects...
+        return <Tag[]> _.map(this.get('tags'), function(cid: string) {
+            // By calling the global collection.
+            return <Tag> (<Tags> tags).get(cid);
+        });
+    }
+    set tags(value: Tag[]) {
+        // Actually save the Model ids only.
+        this.set('tags', _.map(value, function(tag: Tag): string {
+            return <string> tag.cid;
+        }));
+    }
 
     // Convert an intermine.List into a proper Model.
     constructor(list: intermine.List) {
@@ -219,19 +232,40 @@ class List extends Backbone.Model implements ListInterface {
 
         // Save them all, but only some will make it to our Model proper.
         for (var key in list) {
-            if (key) {
-                this[key] = list[key];
+            switch (key) {
+                case 'tags':
+                    // Make into nice refs.
+                    this.tags = _.map(list.tags, (name: string) => {
+                        // Add or increase count, returns the Tag in question.
+                        return <Tag> tags.add({ name: name });
+                    });
+                    break;
+                default:
+                    this[key] = list[key];
             }
         }
 
-        // Make into nice refs.
-        this.tags.forEach((name: string, index: number) => {
-            // Will add or increase count.
-            var tag: Tag = tags.add({ name: name });
-            // Either way, we will ref it like this.
-            this.tags[index] = tag.cid;
-        });
+    }
 
+    // Boost JSONification with JSONified tags.
+    public toJSON(): any {
+        // noinspection JSUnresolvedVariable
+        return _.extend(Backbone.Model.prototype.toJSON.call(this), (() => {
+            // Make use of Backbone.Collection to nicely JSONify.
+            return { tags: new Backbone.Collection(this.tags).toJSON() };
+        })());
+    }
+
+    // Check if all of this list's tags are active.
+    public isActive(): bool {
+        if (!this.tags.length) return true;
+
+        // At least one needs to be active.
+        for (var i = 0; i < this.tags.length; i++) {
+            if (this.tags[i].active) return true;
+        }
+
+        return false;
     }
 
 }
@@ -362,7 +396,7 @@ class TableView extends Backbone.View {
         var self: TableView = this;
 
         // Get active tags.
-        var active: string[] = tags.getActiveNames();
+        var active: Backbone.Model[] = tags.getActive();
 
         // Create a fragment for rendering all lists.
         var fragment = document.createDocumentFragment();
@@ -371,7 +405,7 @@ class TableView extends Backbone.View {
         this.collection.forEach(function(list: List) {
             // Do not create View if our tags do not match the active ones.
             // noinspection JSUnresolvedFunction
-            if (list.tags.length !== 0 && _(list.tags).difference(active).length == list.tags.length) return;
+            if (!list.isActive()) return;
 
             // New View.
             var row: Row = new Row({

@@ -3,7 +3,7 @@
 <td>
     <ul class="tags">
         {{#tags}}
-            <li><span class="color" style="background-color:rgb({{rgb}})"></span></li>
+            <li title="{{name}}"><span class="color" style="background-color:rgb({{rgb}})"></span></li>
         {{/tags}}
     </ul>
     <span class="title">{{name}}</span>

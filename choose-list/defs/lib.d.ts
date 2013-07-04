@@ -64,7 +64,7 @@ interface Async {
 }
 declare var async: Async;
 
-// Backbone 1.0.0.
+// Backbone 1.0.0 & Backbone-Relational 0.8.5
 declare module Backbone {
     export class Model {
         constructor (attr?, opts?);
@@ -150,5 +150,16 @@ declare module Backbone {
         delegateEvents(events?: any): void;
         undelegateEvent(): void;
         tagName: string;
+    }
+
+    // The relational bits.
+    export class RelationalModel extends Model {
+        relations: any;
+    }
+    export class Relation extends Model {
+
+    }
+    export class HasMany extends Relation {
+
     }
 }
