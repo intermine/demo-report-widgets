@@ -87,6 +87,15 @@ class SortedCollection extends Backbone.Collection {
         Backbone.Collection.prototype.add.call(this, obj, opts);
     }
 
+    // Sort and return JSONified.
+    toJSON(): any[] {
+        var out = [];
+        this.forEach(function(model: Backbone.Model) {
+            out.push(model.toJSON());
+        });
+        return out;
+    }
+
 }
 
 // All the tags, coming from Lists.
@@ -122,6 +131,20 @@ class Tags extends SortedCollection {
         return _(this.filter(function(tag: Tag): bool {
             return tag.active;
         }));
+    }
+
+    // Quick access for _.every on a property.
+    every(property: string, all: bool): bool {
+        return <bool> _(this.models).every(function(tag: Tag): bool {
+            return tag[property] === all;
+        });
+    }
+
+    // Set all properties in our models to a particular value.
+    setAll(property: string, value: any): void {
+        this.forEach(function(tag: Tag) {
+            tag.set(property, value);
+        });
     }
 
 }
@@ -328,7 +351,8 @@ class TagsView extends Backbone.View {
     }) {
         // The DOM events.
         this.events = {
-            'click li': 'toggleTag'
+            'click ul.side-nav li': 'toggleTag',
+            'click dl.sub-nav dd': 'toggleFilter'
         };
 
         super(opts);
@@ -338,7 +362,17 @@ class TagsView extends Backbone.View {
 
     render(): TagsView {
         // Render the whole collection in one template.
-        $(this.el).html(this.template.render({ tags: this.collection.toJSON() }));
+        $(this.el).html(this.template.render({
+            tags: this.collection.toJSON(),
+            // Are all tags active?
+            allActive: () => {
+                return this.collection.every('active', true);
+            },
+            // Are all tags inactive?
+            allInactive: () => {
+                return this.collection.every('active', false);
+            }
+        }));
 
         // Chain.
         return this;
@@ -358,7 +392,25 @@ class TagsView extends Backbone.View {
             return false;
         });
 
-        // Re-render.
+        // One big re-render.
+        this.render();
+    }
+
+    // Filter all of the tags either flipping them all active or not.
+    toggleFilter(evt: Event) {
+        // Which filter?.
+        switch ($(evt.target).closest('dd').data('filter')) {
+            case 'all':
+                this.collection.setAll('active', true);
+                break;
+            case 'none':
+                this.collection.setAll('active', false);
+                break;
+            default:
+                throw 'Unknown filter';
+        }
+
+        // One big re-render.
         this.render();
     }
 

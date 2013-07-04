@@ -1,4 +1,9 @@
-<div class="select">Select <span class="all">all</span>/<span class="none">none</span></div>
+<dl class="sub-nav">
+    <dt>Select tags:</dt>
+    <dd{{#allActive}} class="active"{{/allActive}} data-filter="all"><a>All</a></dd>
+    <dd{{#allInactive}} class="active"{{/allInactive}} data-filter="none"><a>None</a></dd>
+</dl>
+
 <ul class="side-nav">
 {{#tags}}
     <li class="{{#active}}active{{/active}}" data-model="{{id}}">
