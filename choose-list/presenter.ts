@@ -2,14 +2,22 @@
 /// <reference path="defs/underscore.d.ts" />
 /// <reference path="defs/lib.d.ts" />
 
+// Map of pagination properties.
+interface PaginatorInterface {
+    perPage: number; // max of how many do we want to see per page?
+    currentPage: number; // the current erm page
+    returned: number; // number of items matching the current page
+    size: number; // the size of the whole collection
+}
+
 // Sort on column key providing direction (asc, desc).
 interface SortInterface {
     key: string;
-    direction: number
+    direction: number;
 }
 
 interface ForEachCallback {
-    (value: Backbone.Model, index: number, array: Backbone.Model[])
+    (value: Backbone.Model, index: number, array: any)
 }
 
 class SortedCollection extends Backbone.Collection {
@@ -54,15 +62,12 @@ class SortedCollection extends Backbone.Collection {
                 switch (typeof(keyA)) {
                     case 'string':
                         return self.sortOrder.direction * keyA.localeCompare(keyB);
-                        break;
                     case 'number':
                         return self.sortOrder.direction * (keyA - keyB);
-                        break;
                     case 'object':
                         // Hope it is a Date.
                         if (keyA instanceof Date) {
-                            return self.sortOrder.direction * (+keyA - +keyB)
-                            break;
+                            return self.sortOrder.direction * (+keyA - +keyB);
                         }
                     default:
                         throw 'Do not know how to sort on key `' + self.sortOrder.key + '`';
@@ -206,10 +211,49 @@ class Tag extends Backbone.Model implements TagInterface {
 class Lists extends SortedCollection {
 
     model: List;
+    paginator: PaginatorInterface;
 
     initialize() {
         // By default sort on the date key.
         this.sortOrder = { key: 'dateCreated', direction: -1 };
+
+        // Init paginator (disregard the fn name).
+        this.paginator = { perPage: 10, currentPage: 1, returned: 0, size: 0 };
+    }
+
+    // Will return a particular "page" of a collection of only active lists.
+    public forEach(cb: ForEachCallback): void {
+        // Reset the paginator.
+        this.paginator.returned = 0;
+        this.paginator.size = 0;
+
+        // Number of lists skipped because they do not match our criteria.
+        var skipped: number = 0;
+
+        // Work out the subset I need to grab.
+        var start: number = this.paginator.perPage * (this.paginator.currentPage - 1) + 1;
+
+        // Call the custom dad.
+        SortedCollection.prototype.forEach.call(this, (list: List, i: number) => {
+            // Do we want you?
+            if (!list.isActive()) {
+                skipped += 1;
+            } else {
+                // Need to have the total count.
+                this.paginator.size += 1;
+
+                // Index sans rubbish.
+                i -= skipped;
+
+                // Fill it up to the number on the page starting with offset.
+                if (i >= start && this.paginator.returned != this.paginator.perPage) {
+                    // Call back.
+                    cb(list, this.paginator.returned, this);
+                    // One less to do.
+                    this.paginator.returned += 1;
+                }
+            }
+        });
     }
 
 }
@@ -470,10 +514,46 @@ class TagsView extends Backbone.View {
 
 }
 
-// Map of pagination properties.
-interface PaginatorInterface {
-    maxRows: number;
-    page: number;
+// The paginator component. Called from TableView.
+class PaginatorView extends Backbone.View {
+
+    private collection: Lists;
+    private template: Hogan.Template;
+    private events: any;
+
+    // Save some things on us.
+    constructor(opts: {
+        collection: Lists // this collection has the paginator interface within
+        template: Hogan.Template
+    }) {
+        // The DOM events.
+        this.events = {
+            'click ul.side-nav li': 'toggleTag',
+            'click dl.sub-nav dd': 'toggleFilter'
+        };
+
+        super(opts);
+
+        this.template = opts.template;
+    }
+
+    render(): PaginatorView {
+        var paginator: PaginatorInterface = this.collection.paginator;
+
+        // Render the whole collection in one template.
+        $(this.el).html(this.template.render(_.extend(paginator, {
+            // Generate an array of "pages" because Hogan is good like that.
+            pages: _.range(1, (paginator.size / paginator.perPage)),
+            // Is this the current page we are on?
+            isCurrent: function(): bool {
+                return parseInt(this) == paginator.currentPage;
+            }
+        })));
+
+        // Chain.
+        return this;
+    }
+
 }
 
 // Complete table of all lists.
@@ -482,10 +562,10 @@ class TableView extends DisposableView {
     private rows: Row[]; // List Row views
     private tags: TagsView; // a View of Tags
     private collection: Lists; // all them lists, nicely attached here
-    private events: any;
+    private events: any; // Backbone events on DOM
     private opts: any; // not saving them straight from constructor as we need to attach events first
     private sortOrder: SortInterface; // keep track of previous sort order to do direction
-    private paginator: PaginatorInterface;
+    private paginator: PaginatorView;
 
     constructor(opts?: any) {
         // The DOM events.
@@ -502,10 +582,10 @@ class TableView extends DisposableView {
         this.rows = [];
 
         // Init paginator.
-        this.paginator = {
-            maxRows: 10,
-            page: 1
-        };
+        this.paginator = new PaginatorView({
+            collection: this.collection,
+            template: this.opts.templates['pagination']
+        });
     }
 
     render(): TableView {
@@ -531,8 +611,6 @@ class TableView extends DisposableView {
 
     // Just re-render lists, properly.
     private renderRows(): void {
-        var self: TableView = this;
-
         // Get active tags.
         var active: Backbone.Model[] = tags.getActive();
 
@@ -542,25 +620,24 @@ class TableView extends DisposableView {
         // Dispose of any previous rows.
         this.disposeOf(this.rows);
 
-        // For each list...
-        this.collection.forEach(function(list: List) {
-            // Do not create View if our tags do not match the active ones.
-            // noinspection JSUnresolvedFunction
-            if (!list.isActive()) return;
-
+        // For each paginated active list...
+        this.collection.forEach((list: List) => {
             // New View.
             var row: Row = new Row({
                 model: list,
-                template: self.opts.templates['row']
+                template: this.opts.templates['row']
             });
             // Push to stack.
-            self.rows.push(row);
+            this.rows.push(row);
             // Append the child.
             fragment.appendChild(row.render().el);
         });
 
         // Render all them lists into table body.
         $(this.el).find('tbody[data-view="rows"]').html(fragment);
+
+        // Render paginator view.
+        $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
     }
 
     // When we click on table heads.
