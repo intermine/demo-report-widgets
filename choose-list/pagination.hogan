@@ -1,6 +1,6 @@
 <ul class="pagination">
     {{#pages}}
-        <li{{#isCurrent}} class="current"{{/isCurrent}}><a>{{.}}</a></li>
+        <li{{#isCurrent}} class="current"{{/isCurrent}} data-page="{{.}}"><a>{{.}}</a></li>
     {{/pages}}
     <!--
     <li class="arrow unavailable"><a>&laquo;</a></li>

@@ -70,7 +70,7 @@ declare module Backbone {
         constructor (attr?, opts?);
         get(name: string): any;
         set(name: string, val: any): void;
-        set(obj: any): void;
+        set(obj: any, opts?: any): void;
         escape(attr: string): string;
         has(attr: string): bool;
         unset(attr: string, opts?: any): void;
@@ -98,6 +98,9 @@ declare module Backbone {
         changedAttributes(attrs?: any): any;
         previous(attr: string): any;
         previousAttributes(): any;
+
+        // Events.
+        bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
     }
     export class Collection {
         constructor (models?, opts?);
@@ -137,6 +140,7 @@ declare module Backbone {
 
         // Events.
         bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
+        trigger(eventName: string, ...args: any[]): any;
     }
     export class View {
         constructor (opts?);
@@ -152,6 +156,18 @@ declare module Backbone {
         tagName: string;
         id: string;
         cid: string;
+    }
+    export class Events {
+        on(eventName: string, callback: (...args: any[]) => void , context?: any): any;
+        off(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
+        trigger(eventName: string, ...args: any[]): any;
+        bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
+        unbind(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
+
+        once(events: string, callback: (...args: any[]) => void , context?: any): any;
+        listenTo(object: any, events: string, callback: (...args: any[]) => void ): any;
+        listenToOnce(object: any, events: string, callback: (...args: any[]) => void ): any;
+        stopListening(object?: any, events?: string, callback?: (...args: any[]) => void ): any;
     }
 
     // The relational bits.

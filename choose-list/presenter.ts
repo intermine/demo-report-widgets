@@ -2,12 +2,64 @@
 /// <reference path="defs/underscore.d.ts" />
 /// <reference path="defs/lib.d.ts" />
 
-// Map of pagination properties.
-interface PaginatorInterface {
-    perPage: number; // max of how many do we want to see per page?
-    currentPage: number; // the current erm page
-    returned: number; // number of items matching the current page
-    size: number; // the size of the whole collection
+// Paginator triggering events and hiding its implementation.
+class Paginator extends Backbone.Model {
+
+    // Max of how many do we want to see per page?
+    get perPage(): number          { return this.get('perPage'); }
+    set perPage(value: number) {
+        if (this.get('perPage') !== value) {
+            this.reset();
+            // This will trigger change.
+            this.set('perPage', value);
+        }
+    }
+
+    // The current erm page.
+    get currentPage(): number      { return this.get('currentPage'); }
+    set currentPage(value: number) {
+        if (this.get('currentPage') !== value) {
+            this.reset();
+            // This will trigger change.
+            this.set('currentPage', value);
+        }
+    }
+
+    // A function accessed as a property :).
+    get pages(): number {
+        return this.size / this.get('perPage');
+    }
+
+    // The size of the whole collection, not just the current page.
+    get size(): number      { return this._size; }
+    set size(value: number) { this._size = value; }
+
+    // Number of items matching the current page.
+    get returned(): number      { return this._returned; }
+    set returned(value: number) { this._returned = value; }
+
+    private _size: number;
+    private _returned: number;
+
+    constructor(opts: {
+        perPage: number;
+    }) {
+        // Some defaults that can be overriden from higher up.
+        super(_.extend({
+            currentPage: 1, // always start on the first page
+            perPage: 10 // have 10 results per page
+        }, opts));
+
+        // Make sure we are internally initialized as well.
+        this.reset();
+    }
+
+    // Reset when we change our size or page. Does not trigger change as not saved as a Model attribute.
+    private reset(): void {
+        this.returned = 0;
+        this.size = 0;
+    }
+
 }
 
 // Sort on column key providing direction (asc, desc).
@@ -211,22 +263,25 @@ class Tag extends Backbone.Model implements TagInterface {
 class Lists extends SortedCollection {
 
     model: List;
-    paginator: PaginatorInterface;
+    paginator: Paginator;
 
     initialize() {
         // By default sort on the date key.
         this.sortOrder = { key: 'dateCreated', direction: -1 };
 
         // Init paginator (disregard the fn name).
-        this.paginator = { perPage: 10, currentPage: 1, returned: 0, size: 0 };
+        this.paginator = new Paginator({ perPage: 10 });
+
+        // Listen for changes on the paginator.
+        this.paginator.bind('change', () => {
+            console.log('paginator changed');
+            // And then trigger our change...
+            this.trigger('change');
+        }, this);
     }
 
     // Will return a particular "page" of a collection of only active lists.
     public forEach(cb: ForEachCallback): void {
-        // Reset the paginator.
-        this.paginator.returned = 0;
-        this.paginator.size = 0;
-
         // Number of lists skipped because they do not match our criteria.
         var skipped: number = 0;
 
@@ -528,8 +583,7 @@ class PaginatorView extends Backbone.View {
     }) {
         // The DOM events.
         this.events = {
-            'click ul.side-nav li': 'toggleTag',
-            'click dl.sub-nav dd': 'toggleFilter'
+            'click li': 'changePage'
         };
 
         super(opts);
@@ -538,12 +592,12 @@ class PaginatorView extends Backbone.View {
     }
 
     render(): PaginatorView {
-        var paginator: PaginatorInterface = this.collection.paginator;
+        var paginator: Paginator = this.collection.paginator;
 
         // Render the whole collection in one template.
-        $(this.el).html(this.template.render(_.extend(paginator, {
+        $(this.el).html(this.template.render(_.extend(paginator.toJSON(), {
             // Generate an array of "pages" because Hogan is good like that.
-            pages: _.range(1, (paginator.size / paginator.perPage)),
+            pages: _.range(1, paginator.pages),
             // Is this the current page we are on?
             isCurrent: function(): bool {
                 return parseInt(this) == paginator.currentPage;
@@ -552,6 +606,24 @@ class PaginatorView extends Backbone.View {
 
         // Chain.
         return this;
+    }
+
+    // When we click on one of the pagin links.
+    private changePage(evt: Event): void {
+        console.log('click event');
+
+        var paginator: Paginator = this.collection.paginator;
+
+        // Which page have we requested.
+        var page: number;
+        // Do nothing if we are on this page.
+        if ((page = $(evt.target).closest('li').data('page')) == paginator.currentPage) return;
+
+        // Change the internal object, will trigger an event which will bubble to lists which changes the table (not us).
+        paginator.currentPage = page;
+
+        // One big re-render of us.
+        this.render();
     }
 
 }
@@ -580,12 +652,6 @@ class TableView extends DisposableView {
 
         // All row views.
         this.rows = [];
-
-        // Init paginator.
-        this.paginator = new PaginatorView({
-            collection: this.collection,
-            template: this.opts.templates['pagination']
-        });
     }
 
     render(): TableView {
@@ -602,8 +668,18 @@ class TableView extends DisposableView {
         });
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
 
-        // Now listen to tag collection active attr changes..
+        // Render paginator view.
+        this.paginator = new PaginatorView({
+            collection: this.collection, // also `lists`
+            template: this.opts.templates['pagination']
+        });
+        $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
+
+        // Now listen to tag collection active attr changes.
         tags.bind('change', this.renderRows, this);
+
+        // Listen for list changes (triggered by paginator).
+        lists.bind('change', this.renderRows, this);
 
         // Chain.
         return this;
@@ -635,9 +711,6 @@ class TableView extends DisposableView {
 
         // Render all them lists into table body.
         $(this.el).find('tbody[data-view="rows"]').html(fragment);
-
-        // Render paginator view.
-        $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
     }
 
     // When we click on table heads.
