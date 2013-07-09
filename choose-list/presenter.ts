@@ -49,13 +49,10 @@ class Paginator extends Backbone.Model {
             currentPage: 1, // always start on the first page
             perPage: 10 // have 10 results per page
         }, opts));
-
-        // Make sure we are internally initialized as well.
-        this.reset();
     }
 
     // Reset when we change our size or page. Does not trigger change as not saved as a Model attribute.
-    private reset(): void {
+    public reset(): void {
         this.returned = 0;
         this.size = 0;
     }
@@ -96,15 +93,13 @@ class SortedCollection extends Backbone.Collection {
 
     // Use custom sort column and order on standard `each`.
     forEach(cb: ForEachCallback): void {
-        var self: SortedCollection = this;
-
         // No cache?
         if (!this.eachCache) {
             // Sort & save then.
-            this.eachCache = (<List[]> this.models).sort(function(a: List, b: List): number {
+            this.eachCache = (<List[]> this.models).sort((a: List, b: List) => {
                 // Get the keys.
-                var keyA = a[self.sortOrder.key],
-                    keyB = b[self.sortOrder.key];
+                var keyA = a[this.sortOrder.key],
+                    keyB = b[this.sortOrder.key];
 
                 if (typeof(keyA) !== typeof(keyB)) {
                     throw 'Key value types do not match'
@@ -113,16 +108,16 @@ class SortedCollection extends Backbone.Collection {
                 // Based on the type of the object...
                 switch (typeof(keyA)) {
                     case 'string':
-                        return self.sortOrder.direction * keyA.localeCompare(keyB);
+                        return this.sortOrder.direction * keyA.localeCompare(keyB);
                     case 'number':
-                        return self.sortOrder.direction * (keyA - keyB);
+                        return this.sortOrder.direction * (keyA - keyB);
                     case 'object':
                         // Hope it is a Date.
                         if (keyA instanceof Date) {
-                            return self.sortOrder.direction * (+keyA - +keyB);
+                            return this.sortOrder.direction * (+keyA - +keyB);
                         }
                     default:
-                        throw 'Do not know how to sort on key `' + self.sortOrder.key + '`';
+                        throw 'Do not know how to sort on key `' + this.sortOrder.key + '`';
                 }
             });
         }
@@ -197,11 +192,22 @@ class Tags extends SortedCollection {
         });
     }
 
-    // Set all properties in our models to a particular value.
+    // Set all properties in our models to a particular value (silently).
     setAll(property: string, value: any): void {
+        // The new.
+        var obj: any = {};
+        obj[property] = value;
+        // Change switch.
+        var changed: bool = false;
+        // For all.
         this.forEach(function(tag: Tag) {
-            tag.set(property, value);
+            if (changed || tag[property] !== value) {
+                changed = true;
+                tag.set(obj, { silent: true });
+            }
         });
+        // Trigger the event once?
+        if (changed) this.trigger('change');
     }
 
 }
@@ -274,7 +280,6 @@ class Lists extends SortedCollection {
 
         // Listen for changes on the paginator.
         this.paginator.bind('change', () => {
-            console.log('paginator changed');
             // And then trigger our change...
             this.trigger('change');
         }, this);
@@ -285,8 +290,11 @@ class Lists extends SortedCollection {
         // Number of lists skipped because they do not match our criteria.
         var skipped: number = 0;
 
+        // Need to rest the internal paginator counters..
+        this.paginator.reset();
+
         // Work out the subset I need to grab.
-        var start: number = this.paginator.perPage * (this.paginator.currentPage - 1) + 1;
+        var start: number = this.paginator.perPage * (this.paginator.currentPage - 1);
 
         // Call the custom dad.
         SortedCollection.prototype.forEach.call(this, (list: List, i: number) => {
@@ -309,6 +317,9 @@ class Lists extends SortedCollection {
                 }
             }
         });
+
+        // Now we know how big we are and can render the paginator.
+        this.trigger('paginated');
     }
 
 }
@@ -511,6 +522,9 @@ class TagsView extends Backbone.View {
         super(opts);
 
         this.template = opts.template;
+
+        // Re-render us when out collection changes.
+        this.collection.bind('change', this.render, this);
     }
 
     render(): TagsView {
@@ -534,24 +548,21 @@ class TagsView extends Backbone.View {
     // Toggle the state of one tag.
     toggleTag(evt: Event) {
         // Get the id of the Model in question.
-        var id: string = $(evt.target).closest('li').data('model');
+        var cid: string = $(evt.target).closest('li').data('model');
 
         // Toggle it.
         this.collection.find(function(tag: Tag): bool {
-            if (tag.cid == id) {
+            if (tag.cid == cid) {
                 tag.active = !tag.active;
                 return true; // do not search further
             }
             return false;
         });
-
-        // One big re-render.
-        this.render();
     }
 
     // Filter all of the tags either flipping them all active or not.
     toggleFilter(evt: Event) {
-        // Which filter?.
+        // Which filter?
         switch ($(evt.target).closest('dd').data('filter')) {
             case 'all':
                 this.collection.setAll('active', true);
@@ -562,9 +573,6 @@ class TagsView extends Backbone.View {
             default:
                 throw 'Unknown filter';
         }
-
-        // One big re-render.
-        this.render();
     }
 
 }
@@ -589,8 +597,12 @@ class PaginatorView extends Backbone.View {
         super(opts);
 
         this.template = opts.template;
+
+        // Re-render us when our collection (lists) have finished paginating (faster).
+        this.collection.bind('paginated', this.render, this);
     }
 
+    // Render the paginator, triggered from TableView.
     render(): PaginatorView {
         var paginator: Paginator = this.collection.paginator;
 
@@ -610,8 +622,6 @@ class PaginatorView extends Backbone.View {
 
     // When we click on one of the pagin links.
     private changePage(evt: Event): void {
-        console.log('click event');
-
         var paginator: Paginator = this.collection.paginator;
 
         // Which page have we requested.
@@ -619,11 +629,8 @@ class PaginatorView extends Backbone.View {
         // Do nothing if we are on this page.
         if ((page = $(evt.target).closest('li').data('page')) == paginator.currentPage) return;
 
-        // Change the internal object, will trigger an event which will bubble to lists which changes the table (not us).
+        // Change the internal object, will trigger an event which will bubble to lists which changes the table (and us).
         paginator.currentPage = page;
-
-        // One big re-render of us.
-        this.render();
     }
 
 }
@@ -652,44 +659,46 @@ class TableView extends DisposableView {
 
         // All row views.
         this.rows = [];
-    }
 
-    render(): TableView {
-        // Render the template.
-        $(this.el).html(this.opts.templates['table'].render({}));
-
-        // Render the table body.
-        this.renderRows();
-
-        // Render them tags.
+        // Tags.
         this.tags = new TagsView({
             collection: tags,
             template: this.opts.templates['tags']
         });
-        $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
 
-        // Render paginator view.
+        // Paginator.
         this.paginator = new PaginatorView({
             collection: this.collection, // also `lists`
             template: this.opts.templates['pagination']
         });
+
+        // Listen for tag de-/activation.
+        tags.bind('change', this.renderTable, this);
+
+        // Listen for list changes (sorting & pagination).
+        this.collection.bind('change', this.renderTable, this);
+    }
+
+    // Construct initially everything.
+    render(): TableView {
+        // The wrapping template.
+        $(this.el).html(this.opts.templates['table'].render({}));
+
+        // Render tags.
+        $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
+
+        // Table & paginator always go together.
+        this.renderTable();
+
+        // Render the paginator below.
         $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
-
-        // Now listen to tag collection active attr changes.
-        tags.bind('change', this.renderRows, this);
-
-        // Listen for list changes (triggered by paginator).
-        lists.bind('change', this.renderRows, this);
 
         // Chain.
         return this;
     }
 
     // Just re-render lists, properly.
-    private renderRows(): void {
-        // Get active tags.
-        var active: Backbone.Model[] = tags.getActive();
-
+    private renderTable(): void {
         // Create a fragment for rendering all lists.
         var fragment = document.createDocumentFragment();
 
@@ -732,8 +741,8 @@ class TableView extends DisposableView {
         // Magic setter.
         this.collection.sortOrder = this.sortOrder;
 
-        // Render.
-        this.renderRows();
+        // Trigger lists change.
+        this.collection.trigger('change');
     }
 
 }
@@ -784,13 +793,11 @@ class App {
     }
 
     render(target: string): void {
-        var self: App = this;
-
         // Work starts here.
         this.cb(null, true, null);
 
         // Get the user's lists.
-        this.service.fetchLists(function(data: intermine.List[]) {
+        this.service.fetchLists((data: intermine.List[]) => {
             // For each list...
             data.forEach(function(item: intermine.List) {
                 // Modelify.
@@ -803,13 +810,13 @@ class App {
             // Construct a new View and dump it to the target.
             var table: Backbone.View = new TableView({
                 collection: lists,
-                config: self.config,
-                templates: self.templates
+                config: this.config,
+                templates: this.templates
             });
             $(target).html(table.render().el);
 
             // No more work.
-            self.cb(null, false, null);
+            this.cb(null, false, null);
         });
     }
 
