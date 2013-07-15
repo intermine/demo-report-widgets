@@ -6,6 +6,14 @@
 import l = module("./models/lists");
 import t = module("./views/table");
 
+// We expect these templates.
+export interface AppTemplates {
+    pagination: Hogan.Template
+    row: Hogan.Template
+    table: Hogan.Template
+    tags: Hogan.Template
+}
+
 export class App {
 
     public config: any;
@@ -45,9 +53,9 @@ export class App {
             errorHandler: this.cb
         });
 
-        // Have some Hogan in you.
+        // Have some Hogan in you (under nice keys).
         for (var key in this.templates) {
-            this.templates[key] = new Hogan.Template(templates[key]);
+            this.templates[key.split('/').pop().replace('.hogan', '')] = new Hogan.Template(templates[key]);
         }
     }
 

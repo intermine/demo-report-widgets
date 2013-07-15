@@ -1,4 +1,5 @@
 /// <reference path="../defs/jquery.d.ts" />
+/// <reference path="../index" />
 /// <reference path="./disposable" />
 /// <reference path="./row" />
 /// <reference path="./tags" />
@@ -7,6 +8,7 @@
 /// <reference path="../models/sort" />
 /// <reference path="./paginator" />
 
+import a = module("../index");
 import d = module("./disposable");
 import r = module("./row");
 import tv = module("./tags");
@@ -43,13 +45,13 @@ export class TableView extends d.DisposableView {
         // Tags.
         this.tags = new tv.TagsView({
             collection: tm.tags,
-            template: this.opts.templates['tags.hogan']
+            template: this.opts.templates.tags
         });
 
         // Paginator.
         this.paginator = new p.PaginatorView({
             collection: this.collection, // also `lists`
-            template: this.opts.templates['pagination.hogan']
+            template: this.opts.templates.pagination
         });
 
         // Listen for tag de-/activation.
@@ -62,7 +64,7 @@ export class TableView extends d.DisposableView {
     // Construct initially everything.
     render(): TableView {
         // The wrapping template.
-        $(this.el).html(this.opts.templates['table.hogan'].render({}));
+        $(this.el).html(this.opts.templates.table.render({}));
 
         // Render tags.
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
@@ -90,7 +92,7 @@ export class TableView extends d.DisposableView {
             // New View.
             var row: r.RowView = new r.RowView({
                 model: list,
-                template: this.opts.templates['row.hogan']
+                template: this.opts.templates.row
             });
             // Push to stack.
             this.rows.push(row);
