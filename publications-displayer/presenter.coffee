@@ -58,7 +58,7 @@ class Table extends Backbone.View
 
 
 # This is my app definition, needs to have a set signature.
-class App
+class exports.App
 
     # Have access to config and templates compiled in.
     constructor: (@config, @templates) ->
@@ -100,7 +100,7 @@ class App
                 # Pop the publications for this gene.
                 'collection': new Publications records
                 # 'table.eco' template.
-                'template':   @templates.table
+                'template':   @templates['table.eco']
                 # Initial symbol coming from client side config.
                 'symbol':     @config.symbol
                 # Link back to the data loader.

@@ -663,13 +663,13 @@ class TableView extends DisposableView {
         // Tags.
         this.tags = new TagsView({
             collection: tags,
-            template: this.opts.templates['tags']
+            template: this.opts.templates['tags.hogan']
         });
 
         // Paginator.
         this.paginator = new PaginatorView({
             collection: this.collection, // also `lists`
-            template: this.opts.templates['pagination']
+            template: this.opts.templates['pagination.hogan']
         });
 
         // Listen for tag de-/activation.
@@ -682,7 +682,7 @@ class TableView extends DisposableView {
     // Construct initially everything.
     render(): TableView {
         // The wrapping template.
-        $(this.el).html(this.opts.templates['table'].render({}));
+        $(this.el).html(this.opts.templates['table.hogan'].render({}));
 
         // Render tags.
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);
@@ -710,7 +710,7 @@ class TableView extends DisposableView {
             // New View.
             var row: Row = new Row({
                 model: list,
-                template: this.opts.templates['row']
+                template: this.opts.templates['row.hogan']
             });
             // Push to stack.
             this.rows.push(row);
@@ -747,7 +747,7 @@ class TableView extends DisposableView {
 
 }
 
-class App {
+export class App {
 
     public config: any;
     private service: intermine.Service;

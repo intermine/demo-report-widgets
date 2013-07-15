@@ -14,7 +14,7 @@ Set the assertion on the window object.
 
 
 # This class encapsulates the App behavior.
-class App
+class exports.App
 
     # PathQueries to fetch the allele terms for a symbol and high level terms for these terms.
     pq:
@@ -139,7 +139,7 @@ class App
     # Render the graph.
     render: (@target) ->
         # Render the app wrapper.
-        $(@target).html @templates.app
+        $(@target).html @templates['app.eco']
             'symbol': @config.symbol
 
         do dis = =>
@@ -171,7 +171,7 @@ class App
         assert @max?, '`max` top allele count not provided'
 
         # Show the config for the graph.
-        config = new Config @templates.config, $(@target).find('.config')
+        config = new Config @templates['config.eco'], $(@target).find('.config')
 
         # Re-render the graph on config update.
         config.update (config) =>  @dendrogram data, config
@@ -280,7 +280,7 @@ class App
                         'el': target
                         'pq': pq
                         'service': @service
-                        'template': @templates.popover
+                        'template': @templates['popover.eco']
 
 
 # Config toolbox app controls thingie.

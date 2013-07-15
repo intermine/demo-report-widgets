@@ -19,7 +19,7 @@ $ = jQuery or Zepto
 
 
 ### Behavior of the app.###
-class App
+class exports.App
 
     constructor: (@config, @templates) ->
         @service = new intermine.Service 'root': 'http://beta.flymine.org/beta'
@@ -31,7 +31,7 @@ class App
             'attributes':
                 'head':     @config.organisms
                 'title':    @config.symbol
-                'template': @templates.grid
+                'template': @templates['grid.eco']
 
         grid.messages.new 'Loading homologues &hellip;', 'homologues'
 

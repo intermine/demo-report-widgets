@@ -7,7 +7,7 @@ class Form extends Backbone.View
 
     render: ->
         # Populate the template.
-        $(@el).html @templates[@config.type] @config
+        $(@el).html @templates[@config.type + '.eco'] @config
 
         @
 
@@ -85,7 +85,7 @@ class Form extends Backbone.View
             self.config.cb err, false, q
 
 # This is my app definition, needs to have a set signature.
-class App
+class exports.App
 
     # Have access to config and templates compiled in.
     constructor: (@config, @templates) ->

@@ -15,7 +15,7 @@ Set the assertion on the window object.
 
 # This is my app definition, needs to have a set signature.
 # There always needs to be one and only one class `App`.
-class App
+class exports.App
 
     # Google Visualization chart options.
     chartOptions:
@@ -69,7 +69,7 @@ class App
         assert @config.symbol, 'an object `symbol` needs to be set'
 
         # Render template with loading text.
-        $(@target).html @templates.chart
+        $(@target).html @templates['chart.eco']
             'symbol': @config.symbol
 
         # Attach an event to update graph on symbol change.
