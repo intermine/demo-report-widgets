@@ -1,4 +1,11 @@
 /// <reference path="../defs/jquery.d.ts" />
+/// <reference path="./disposable" />
+/// <reference path="./row" />
+/// <reference path="./tags" />
+/// <reference path="../models/tags" />
+/// <reference path="../models/lists" />
+/// <reference path="../models/sort" />
+/// <reference path="./paginator" />
 
 import d = module("./disposable");
 import r = module("./row");
@@ -49,7 +56,7 @@ export class TableView extends d.DisposableView {
         tm.tags.bind('change', this.renderTable, this);
 
         // Listen for list changes (sorting & pagination).
-        this.collection.bind('change', this.renderTable, this);
+        (<Backbone.Collection> this.collection).bind('change', this.renderTable, this);
     }
 
     // Construct initially everything.
@@ -79,7 +86,7 @@ export class TableView extends d.DisposableView {
         this.disposeOf(this.rows);
 
         // For each paginated active listv...
-        this.collection.forEach((list: l.List) => {
+        (<Backbone.Collection> this.collection).forEach((list: l.List) => {
             // New View.
             var row: r.RowView = new r.RowView({
                 model: list,
@@ -112,10 +119,10 @@ export class TableView extends d.DisposableView {
         }
 
         // Magic setter.
-        this.collection.sortOrder = this.sortOrder;
+        (<s.SortedCollection> this.collection).sortOrder = this.sortOrder;
 
         // Trigger lists change.
-        this.collection.trigger('change');
+        (<s.SortedCollection> this.collection).trigger('change');
     }
 
 }

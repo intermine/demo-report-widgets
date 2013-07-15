@@ -1,5 +1,7 @@
 /// <reference path="defs/lib.d.ts" />
 /// <reference path="defs/jquery.d.ts" />
+/// <reference path="./models/lists.ts" />
+/// <reference path="./views/table.ts" />
 
 import l = module("./models/lists");
 import t = module("./views/table");
@@ -65,12 +67,12 @@ export class App {
             });
 
             // Construct a new View and dump it to the target.
-            var table: Backbone.View = new t.TableView({
+            var table = new t.TableView({
                 collection: l.lists,
                 config: this.config,
                 templates: this.templates
             });
-            $(target).html(table.render().el);
+            $(target).html((<Backbone.View> table.render()).el);
 
             // No more work.
             this.cb(null, false, null);

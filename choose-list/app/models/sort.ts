@@ -1,5 +1,6 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
+/// <reference path="./lists.ts" />
 
 import l = module("./lists");
 
@@ -79,8 +80,7 @@ export class SortedCollection extends Backbone.Collection {
         } else {
             opts.sort = false;
         }
-        // noinspection JSUnresolvedVariable
-        Backbone.Collection.prototype.add.call(this, obj, opts);
+        Backbone.Collection['prototype'].add.call(this, obj, opts);
     }
 
     // Sort and return JSONified.

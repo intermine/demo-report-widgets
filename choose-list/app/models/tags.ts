@@ -1,4 +1,5 @@
 /// <reference path="../defs/lib.d.ts" />
+/// <reference path="./sort.ts" />
 
 import s = module("./sort");
 
@@ -39,8 +40,7 @@ export class Tag extends Backbone.Model implements TagInterface {
 
     // Boost JSONification with our internal id.
     public toJSON(): any {
-        // noinspection JSUnresolvedVariable
-        return _.extend(Backbone.Model.prototype.toJSON.call(this), { id: this.cid });
+        return _.extend(Backbone.Model['prototype'].toJSON.call(this), { id: this.cid });
     }
 
     // Return a color for a string.
@@ -75,8 +75,7 @@ export class Tags extends s.SortedCollection {
             tag.count += 1;
         } else {
             tag = new Tag(obj);
-            // noinspection JSUnresolvedVariable
-            s.SortedCollection.prototype.add.call(this, tag);
+            s.SortedCollection['prototype'].add.call(this, tag);
             // Backbone.Collection.prototype.add.call(this, tag, { sort: false });
         }
 

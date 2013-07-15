@@ -1,6 +1,8 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/jquery.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
+/// <reference path="../models/lists.ts" />
+/// <reference path="../models/paginator.ts" />
 
 import l = module("../models/lists");
 import p = module("../models/paginator");
@@ -27,7 +29,7 @@ export class PaginatorView extends Backbone.View {
         this.template = opts.template;
 
         // Re-render us when our collection (lists) have finished paginating (faster).
-        this.collection.bind('paginated', this.render, this);
+        (<Backbone.Collection> this.collection).bind('paginated', this.render, this);
     }
 
     // Render the paginator, triggered from TableView.

@@ -1,5 +1,6 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/jquery.d.ts" />
+/// <reference path="./disposable.ts" />
 
 import d = module("./disposable");
 

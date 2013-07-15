@@ -1,5 +1,6 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/jquery.d.ts" />
+/// <reference path="../models/tags.ts" />
 
 import t = module("../models/tags");
 
@@ -26,13 +27,13 @@ export class TagsView extends Backbone.View {
         this.template = opts.template;
 
         // Re-render us when out collection changes.
-        this.collection.bind('change', this.render, this);
+        (<Backbone.Collection> this.collection).bind('change', this.render, this);
     }
 
     render(): TagsView {
         // Render the whole collection in one template.
         $(this.el).html(this.template.render({
-            tags: this.collection.toJSON(),
+            tags: (<Backbone.Collection> this.collection).toJSON(),
             // Are all tags active?
             allActive: () => {
                 return this.collection.every('active', true);
@@ -53,7 +54,7 @@ export class TagsView extends Backbone.View {
         var cid: string = $(evt.target).closest('li').data('model');
 
         // Toggle it.
-        this.collection.find(function(tag: t.Tag): bool {
+        (<Backbone.Collection> this.collection).find(function(tag: t.Tag): bool {
             if (tag.cid == cid) {
                 tag.active = !tag.active;
                 return true; // do not search further

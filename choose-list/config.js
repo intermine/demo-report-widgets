@@ -25,12 +25,6 @@ module.exports = {
                     "_"
                 ]
             },
-            "Backbone.RelationalModel": {
-                "path": "http://cdn.intermine.org/js/backbone.relational/0.8.5/backbone-relational.min.js",
-                "depends": [
-                    "Backbone"
-                ]
-            },
             "intermine.imjs": {
                 "path": "http://cdn.intermine.org/js/intermine/imjs/latest/im.js",
                 "depends": [

@@ -1,5 +1,8 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
+/// <reference path="./sort.ts" />
+/// <reference path="./paginator.ts" />
+/// <reference path="./tags.ts" />
 
 import s = module("./sort");
 import p = module("./paginator");
@@ -37,7 +40,7 @@ export class Lists extends s.SortedCollection {
         var start: number = this.paginator.perPage * (this.paginator.currentPage - 1);
 
         // Call the custom dad.
-        s.SortedCollection.prototype.forEach.call(this, (list: List, i: number) => {
+        s.SortedCollection['prototype'].forEach.call(this, (list: List, i: number) => {
             // Do we want you?
             if (!list.isActive()) {
                 skipped += 1;
@@ -95,7 +98,7 @@ export class List extends Backbone.Model implements ListInterface {
         // Convert internal list of strings into actual objects...
         return <t.Tag[]> _.map(this.get('tags'), function(cid: string) {
             // By calling the global collection.
-            return <t.Tag> (<t.Tags> t.tags).get(cid);
+            return <t.Tag> (<Backbone.Collection> t.tags).get(cid);
         });
     }
     set tags(value: t.Tag[]) {
@@ -129,8 +132,7 @@ export class List extends Backbone.Model implements ListInterface {
 
     // Boost JSONification with JSONified tags.
     public toJSON(): any {
-        // noinspection JSUnresolvedVariable
-        return _.extend(Backbone.Model.prototype.toJSON.call(this), (() => {
+        return _.extend(Backbone.Model['prototype'].toJSON.call(this), (() => {
             // Make use of Backbone.Collection to nicely JSONify.
             return { tags: new Backbone.Collection(this.tags).toJSON() };
         })());
