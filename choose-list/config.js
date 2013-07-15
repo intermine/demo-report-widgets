@@ -4,6 +4,7 @@ module.exports = {
     "title": "Choose a list",
     "description": "Choose from among InterMine lists user has access to",
     "version": "0.0.1",
+    "appRoot": "app/index",
     "dependencies": {
         "css": {
             "FoundationCSS": {
