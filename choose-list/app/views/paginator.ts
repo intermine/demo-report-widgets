@@ -33,12 +33,12 @@ export class PaginatorView extends d.DisposableView {
 
     // Render the paginator, triggered from TableView.
     render(): PaginatorView {
-        var paginator:p.Paginator = this.collection.paginator;
+        var paginator: p.Paginator = this.collection.paginator;
 
         // Render the whole collection in one template.
         $(this.el).html(this.template.render(_.extend(paginator.toJSON(), {
             // Generate an array of "pages" because Hogan is good like that.
-            pages: _.range(1, paginator.pages),
+            pages: _.range(1, paginator.pages + 1), // 1 indexed
             // Is this the current page we are on?
             isCurrent: function(): bool {
                 return parseInt(this) == paginator.currentPage;

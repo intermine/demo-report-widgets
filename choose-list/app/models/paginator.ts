@@ -31,7 +31,7 @@ export class Paginator extends Backbone.Model {
 
     // A function accessed as a property :).
     get pages(): number {
-        return this.size / this.get('perPage');
+        return Math.ceil(this.size / this.get('perPage')); // round up
     }
 
     // The size of the whole collection, not just the current page.

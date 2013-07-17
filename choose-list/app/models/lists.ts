@@ -36,7 +36,7 @@ export class Lists extends s.SortedCollection {
         // Need to reset the internal paginator counters..
         this.paginator.reset();
 
-        // Work out the subset I need to grab.
+        // Work out the subset that I need to grab.
         var start: number = this.paginator.perPage * (this.paginator.currentPage - 1);
 
         // Call the custom dad.
