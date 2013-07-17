@@ -569,6 +569,8 @@ interface UnderscoreStatic {
 
     bindAll (object : any, ...methodNames : string[]) : void;
 
+    partial ( fn: Function, ...arguments : any[]): any;
+
     memoize (fn : (...args : any[]) => any, hashFunction? : (value : any) => any) : (...args : any[]) => any;
 
     delay (fn : (...args : any[]) => any, wait : number, ...arguments : any[]) : void;

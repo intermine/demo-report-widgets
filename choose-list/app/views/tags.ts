@@ -1,8 +1,10 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/jquery.d.ts" />
 /// <reference path="../models/tags.ts" />
+/// <reference path="../mediator" />
 
 import t = module("../models/tags");
+import m = module("../mediator");
 
 // Encapsulates all tags in a sidebar.
 export class TagsView extends Backbone.View {
@@ -61,6 +63,9 @@ export class TagsView extends Backbone.View {
             }
             return false;
         });
+
+        // Trigger an event (TableView is listening).
+        m.mediator.trigger('change:tags');
     }
 
     // Filter all of the tags either flipping them all active or not.
@@ -76,6 +81,9 @@ export class TagsView extends Backbone.View {
             default:
                 throw 'Unknown filter';
         }
+
+        // Trigger an event (TableView is listening).
+        m.mediator.trigger('change:tags');
     }
 
 }

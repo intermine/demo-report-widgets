@@ -33,7 +33,7 @@ export class Lists extends s.SortedCollection {
         // Number of lists skipped because they do not match our criteria.
         var skipped: number = 0;
 
-        // Need to rest the internal paginator counters..
+        // Need to reset the internal paginator counters..
         this.paginator.reset();
 
         // Work out the subset I need to grab.
@@ -60,9 +60,6 @@ export class Lists extends s.SortedCollection {
                 }
             }
         });
-
-        // Now we know how big we are and can render the paginator.
-        this.trigger('paginated');
     }
 
 }

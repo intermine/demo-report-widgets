@@ -1,4 +1,5 @@
 /// <reference path="../defs/jquery.d.ts" />
+/// <reference path="../defs/underscore.d.ts" />
 /// <reference path="../index" />
 /// <reference path="./disposable" />
 /// <reference path="./row" />
@@ -7,6 +8,7 @@
 /// <reference path="../models/lists" />
 /// <reference path="../models/sort" />
 /// <reference path="./paginator" />
+/// <reference path="../mediator" />
 
 import a = module("../index");
 import d = module("./disposable");
@@ -16,6 +18,7 @@ import tm = module("../models/tags");
 import l = module("../models/lists");
 import s = module("../models/sort");
 import p = module("./paginator");
+import m = module("../mediator");
 
 // Complete table of all lists.
 export class TableView extends d.DisposableView {
@@ -48,17 +51,8 @@ export class TableView extends d.DisposableView {
             template: this.opts.templates.tags
         });
 
-        // Paginator.
-        this.paginator = new p.PaginatorView({
-            collection: this.collection, // also `lists`
-            template: this.opts.templates.pagination
-        });
-
-        // Listen for tag de-/activation.
-        tm.tags.bind('change', this.renderTable, this);
-
-        // Listen for list changes (sorting & pagination).
-        (<Backbone.Collection> this.collection).bind('change', this.renderTable, this);
+        // Listen for all events here (like a boss).
+        m.mediator.on('change:page change:sort change:tags', this.renderTable, this); // will get page number passed in
     }
 
     // Construct initially everything.
@@ -72,22 +66,25 @@ export class TableView extends d.DisposableView {
         // Table & paginator always go together.
         this.renderTable();
 
-        // Render the paginator below.
-        $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
-
         // Chain.
         return this;
     }
 
     // Just re-render lists, properly.
-    private renderTable(): void {
+    private renderTable(page?: number): void {
+        // First page?
+        page = page || 1;
+
+        // Set the current page on the collection's pagin.
+        this.collection.paginator.currentPage = page;
+
         // Create a fragment for rendering all lists.
         var fragment = document.createDocumentFragment();
 
         // Dispose of any previous rows.
         this.disposeOf(this.rows);
 
-        // For each paginated active listv...
+        // For each paginated active list...
         (<Backbone.Collection> this.collection).forEach((list: l.List) => {
             // New View.
             var row: r.RowView = new r.RowView({
@@ -102,6 +99,18 @@ export class TableView extends d.DisposableView {
 
         // Render all them lists into table body.
         $(this.el).find('tbody[data-view="rows"]').html(fragment);
+
+        // Clean up.
+        if (this.paginator) this.paginator.dispose();
+
+        // New pagin.
+        this.paginator = new p.PaginatorView({
+            collection: <l.Lists> this.collection,
+            template: this.opts.templates.pagination
+        });
+
+        // Render the paginator below.
+        $(this.el).find('div[data-view="pagination"]').html(this.paginator.render().el);
     }
 
     // When we click on table heads.
@@ -120,11 +129,11 @@ export class TableView extends d.DisposableView {
             };
         }
 
-        // Magic setter.
+        // Magic setter will change our internal each cache.
         (<s.SortedCollection> this.collection).sortOrder = this.sortOrder;
 
-        // Trigger lists change.
-        (<s.SortedCollection> this.collection).trigger('change');
+        // Trigger an event change (we are listening) which will re-render the table and paginator.
+        m.mediator.trigger('change:sort');
     }
 
 }

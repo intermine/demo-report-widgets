@@ -1,5 +1,8 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
+/// <reference path="../mediator" />
+
+import m = module("../mediator");
 
 // Paginator triggering events and hiding its implementation.
 export class Paginator extends Backbone.Model {
@@ -9,8 +12,9 @@ export class Paginator extends Backbone.Model {
     set perPage(value: number) {
         if (this.get('perPage') !== value) {
             this.reset();
-            // This will trigger change.
             this.set('perPage', value);
+            // Trigger an event on mediator.
+            m.mediator.trigger('change:page', 1);
         }
     }
 
@@ -19,8 +23,9 @@ export class Paginator extends Backbone.Model {
     set currentPage(value: number) {
         if (this.get('currentPage') !== value) {
             this.reset();
-            // This will trigger change.
             this.set('currentPage', value);
+            // Trigger an event on mediator.
+            m.mediator.trigger('change:page', value);
         }
     }
 

@@ -3,12 +3,14 @@
 /// <reference path="../defs/underscore.d.ts" />
 /// <reference path="../models/lists.ts" />
 /// <reference path="../models/paginator.ts" />
+/// <reference path="./disposable.ts" />
 
 import l = module("../models/lists");
 import p = module("../models/paginator");
+import d = module("./disposable");
 
 // The paginator component. Called from TableView.
-export class PaginatorView extends Backbone.View {
+export class PaginatorView extends d.DisposableView {
 
     private collection:l.Lists;
     private template: Hogan.Template;
@@ -27,9 +29,6 @@ export class PaginatorView extends Backbone.View {
         super(opts);
 
         this.template = opts.template;
-
-        // Re-render us when our collection (lists) have finished paginating (faster).
-        (<Backbone.Collection> this.collection).bind('paginated', this.render, this);
     }
 
     // Render the paginator, triggered from TableView.
@@ -50,16 +49,16 @@ export class PaginatorView extends Backbone.View {
         return this;
     }
 
-    // When we click on one of the pagin links.
+    // When we click on one of the pagin links or manually on our request.
     private changePage(evt: Event): void {
-        var paginator:p.Paginator = this.collection.paginator;
+        var paginator: p.Paginator = this.collection.paginator;
 
-        // Which page have we requested.
-        var page: number;
-        // Do nothing if we are on this page.
-        if ((page = $(evt.target).closest('li').data('page')) == paginator.currentPage) return;
+        // Which page have we requested?
+        var page: number = parseInt($(evt.target).closest('li').data('page'));
+        // Do nothing if we are on this page (handled on Paginator Model now).
+        // if (page == paginator.currentPage) return;
 
-        // Change the internal object, will trigger an event which will bubble to lists which changes the table (and us).
+        // Change the internal object?
         paginator.currentPage = page;
     }
 
