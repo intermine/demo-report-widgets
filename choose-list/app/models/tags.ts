@@ -42,8 +42,8 @@ export class Tag extends Backbone.Model implements TagInterface {
         // Set the name from the incoming object.
         this.name = obj.name;
 
-        // Say you are active.
-        this.active = true;
+        // Say are you active?
+        this.active = obj.active;
 
         // Init count.
         this.count = 1;
@@ -85,8 +85,6 @@ export class Tags extends s.SortedCollection {
 
     // Add a new tag or increase count.
     add(obj: any): Tag {
-        console.log(this.hidden);
-
         // Do we have it?
         var tag: Tag;
         if (tag = <Tag> this.find(function(item: Tag) {
@@ -94,6 +92,9 @@ export class Tags extends s.SortedCollection {
         })) {
             tag.count += 1;
         } else {
+            // Hidden?
+            obj.active = this.hidden.indexOf(obj.name) == -1;
+            // Add.
             tag = new Tag(obj);
             s.SortedCollection['prototype'].add.call(this, tag);
             // Backbone.Collection.prototype.add.call(this, tag, { sort: false });
