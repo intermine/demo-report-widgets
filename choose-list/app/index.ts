@@ -6,6 +6,18 @@
 import l = module("./models/lists");
 import t = module("./views/table");
 
+// All the config passed in.
+export interface AppConfig {
+    mine: string
+    token: string
+    // User provided input.
+    provided?: {
+        list?: string
+        hidden?: string[]
+    }
+    cb(err: Error, working: bool, list: any): void
+}
+
 // We expect these templates.
 export interface AppTemplates {
     pagination: Hogan.Template
@@ -17,22 +29,13 @@ export interface AppTemplates {
 
 export class App {
 
-    public config: any;
     private service: intermine.Service;
     private cb: Function;
 
     // Enforce callback and templates.
     constructor(
-        config: {
-            mine: string
-            token: string
-            cb(err: Error, working: bool, list: any): void
-        },
-        private templates: {
-            table: string // the whole shebang
-            row: string // individual list row
-            tags: string // all them tags
-        }
+        private config: AppConfig,
+        private templates: AppTemplates
     ) {
         // Make sure we have something to call to. Something throw-y.
         this.cb = (config.cb == null || typeof(config.cb) !== 'function') ? function(
