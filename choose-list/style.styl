@@ -14,25 +14,30 @@ table
         th[data-sort]
             cursor: pointer
 
-    ul.tags
-        float: right
+    tbody
+        tr.selected
+            td
+                background: #FFFFD4
 
-        li
-            position: relative
+        ul.tags
+            float: right
 
-            for icon in $icons
-                $name = '"' + icon[0] + '"'
-                &[data-slug={$name}]
-                    .tooltip
-                        .text:before
-                            font-family: Entypo
-                            font-size: 22px
-                            line-height: 1px
-                            margin-right: 3px
-                            vertical-align: middle
-                            display: inline-block
-                            content: icon[1]
-                            font-weight: normal
+            li
+                position: relative
+
+                for icon in $icons
+                    $name = '"' + icon[0] + '"'
+                    &[data-slug={$name}]
+                        .tooltip
+                            .text:before
+                                font-family: Entypo
+                                font-size: 22px
+                                line-height: 1px
+                                margin-right: 3px
+                                vertical-align: middle
+                                display: inline-block
+                                content: icon[1]
+                                font-weight: normal
 
 span.color
     width: 12px
@@ -89,3 +94,8 @@ dl.sub-nav, ul.side-nav, ul.pagination, table thead
     top: 20px
     max-width: inherit
     white-space: nowrap
+
+button#submit
+    display: block
+    margin: 0 auto
+    margin-top: 20px

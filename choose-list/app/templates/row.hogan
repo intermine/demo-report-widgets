@@ -1,4 +1,4 @@
-<td><input type="checkbox" /></td>
+<td><input type="checkbox" {{#selected}}checked="checked"{{/selected}}/></td>
 <td>
     <ul class="tags">
         {{#tags}}

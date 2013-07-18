@@ -13,7 +13,7 @@ export interface AppConfig {
     token: string
     // User provided input.
     provided?: {
-        list?: string
+        selected?: string
         hidden?: string[]
     }
     cb(err: Error, working: bool, list: any): void
@@ -68,16 +68,26 @@ export class App {
         // Work starts here.
         this.cb(null, true, null);
 
-        // Any hidden tags to speak of?
-        if (this.config.provided
-            && this.config.provided.hidden
-            && this.config.provided.hidden instanceof Array)
-        {
-            tg.tags.setHidden(this.config.provided.hidden);
+        if (this.config.provided) {
+            // Any hidden tags to speak of?
+            if (this.config.provided.hidden && this.config.provided.hidden instanceof Array) {
+                tg.tags.hidden = this.config.provided.hidden;
+            }
+            // Any selected list?
+            if (this.config.provided.selected) {
+                l.lists.selected = this.config.provided.selected;
+            }
         }
 
         // Get the user's lists.
         this.service.fetchLists((data: intermine.List[]) => {
+            // Construct a new View so we can capture list events.
+            var table = new ta.TableView({
+                collection: l.lists,
+                config: this.config,
+                templates: this.templates
+            });
+
             // For each list...
             data.forEach(function(item: intermine.List) {
                 // Modelify.
@@ -87,12 +97,7 @@ export class App {
                 l.lists.add(list);
             });
 
-            // Construct a new View and dump it to the target.
-            var table = new ta.TableView({
-                collection: l.lists,
-                config: this.config,
-                templates: this.templates
-            });
+            // Now we can safely render.
             $(target).html((<Backbone.View> table.render()).el);
 
             // No more work.

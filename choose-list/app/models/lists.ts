@@ -3,16 +3,20 @@
 /// <reference path="./sort.ts" />
 /// <reference path="./paginator.ts" />
 /// <reference path="./tags.ts" />
+/// <reference path="../mediator" />
 
 import s = module("./sort");
 import p = module("./paginator");
 import t = module("./tags");
+import m = module("../mediator");
 
 // All the lists.
 export class Lists extends s.SortedCollection {
 
     model: List;
     paginator: p.Paginator;
+
+    public selected: string; // a selected list on us (once it arrives)
 
     initialize() {
         // By default sort on the date key.
@@ -26,6 +30,16 @@ export class Lists extends s.SortedCollection {
             // And then trigger our change...
             this.trigger('change');
         }, this);
+    }
+
+    // Select this list?
+    add(obj: any, opts?: any): void {
+        obj.selected = (obj.name === this.selected);
+
+        // Trigger an event?
+        if (obj.selected) m.mediator.trigger("selected:list");
+
+        s.SortedCollection['prototype'].add.call(this, obj, opts);
     }
 
     // Will return a particular "page" of a collection of only active lists.
@@ -89,6 +103,8 @@ export class List extends Backbone.Model implements ListInterface {
     set status(value: string)      { this.set('status', value); }
     get type(): string             { return this.get('type'); }
     set type(value: string)        { this.set('type', value); }
+    get selected(): bool           { return this.get('selected'); }
+    set selected(value: bool)      { this.set('selected', value); }
 
     // Tags are a relation where we pass/get Tag objects but internally store only their ids.
     get tags(): t.Tag[] {

@@ -30,6 +30,7 @@ export class TableView extends d.DisposableView {
     private opts: any; // not saving them straight from constructor as we need to attach events first
     private sortOrder: s.SortInterface; // keep track of previous sort order to do direction
     private paginator: p.PaginatorView;
+    private submit: any; // quick access to our submit button (or bool setting when selected but not rendered)
 
     constructor(opts?: any) {
         // The DOM events.
@@ -53,12 +54,28 @@ export class TableView extends d.DisposableView {
 
         // Listen for all events here (like a boss).
         m.mediator.on('change:page change:sort change:tags', this.renderTable, this); // will get page number passed in
+
+        // Monitor when our lists get selected.
+        m.mediator.on("selected:list", () => {
+            // ...and then enable the submit button for the user.
+            if (this.submit) {
+                (<JQuery> this.submit).removeClass('disabled')
+            } else {
+                // Enable the button once we render.
+                this.submit = true;
+            }
+        }, this);
     }
 
     // Construct initially everything.
     render(): TableView {
         // The wrapping template.
         $(this.el).html(this.opts.templates.table.render({}));
+
+        // Link to submit button. Already selected?
+        var _btn: JQuery = $(this.el).find('#submit');
+        if (this.submit) _btn.removeClass('disabled');
+        this.submit = _btn;
 
         // Render tags.
         $(this.el).find('div[data-view="tags"]').html(this.tags.render().el);

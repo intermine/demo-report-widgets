@@ -64,7 +64,7 @@ module.exports = {
         'token': 'X133AbT7J0Z0HfV316Q4', // token so we can access private lists
         // Provided input, if any.
         'provided': {
-            'list': 'My list', // a name of the list that is to be "highlighted"
+            'selected': 'demo-list', // a name of the list that is to be "highlighted"
             'hidden': [ 'temp' ] // hide lists tagged with this label
         },
         // A callback called at least once.
@@ -74,7 +74,7 @@ module.exports = {
             // Are you working?
             console.log('working:', working);
             // Are you done? Dump the list then.
-            console.log('list:', query);
+            console.log('list:', list);
         }
     }
-}
+};

@@ -42,6 +42,9 @@ export class RowView extends d.DisposableView {
         // Render our template.
         $(this.el).html(this.templates.row.render(data));
 
+        // Selected list? Add a class on us.
+        if (data.selected) $(this.el).addClass('selected');
+
         // Chain.
         return this;
     }

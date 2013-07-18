@@ -76,7 +76,7 @@ export class Tags extends s.SortedCollection {
 
     model: Tag;
 
-    private hidden: string[]; // hidden tags config
+    public hidden: string[]; // hidden tags config
 
     initialize() {
         // By default sort on the count of lists with our tag.
@@ -133,11 +133,6 @@ export class Tags extends s.SortedCollection {
         });
         // Trigger the event once?
         if (changed) this.trigger('change');
-    }
-
-    // Set tag labels that are to be hidden by default.
-    setHidden(hidden: string[]): void {
-        this.hidden = hidden;
     }
 
 }
