@@ -66,8 +66,6 @@ export class RowView extends d.DisposableView {
                     el: tooltip
                 };
             }
-            // JSONify and render our tooltip with it.
-            console.log(tag.toJSON());
         }
     }
 

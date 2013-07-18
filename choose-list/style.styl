@@ -1,3 +1,5 @@
+$icons = (favourite "♥") (public "🌎")
+
 input[type="checkbox"]
     margin: 0
 
@@ -17,6 +19,20 @@ table
 
         li
             position: relative
+
+            for icon in $icons
+                $name = '"' + icon[0] + '"'
+                &[data-slug={$name}]
+                    .tooltip
+                        .text:before
+                            font-family: Entypo
+                            font-size: 22px
+                            line-height: 1px
+                            margin-right: 3px
+                            vertical-align: middle
+                            display: inline-block
+                            content: icon[1]
+                            font-weight: normal
 
 span.color
     width: 12px
@@ -49,7 +65,7 @@ div[data-view="tags"]
                     background: #FFF
                     margin: 2px
 
-            for icon in (favourite "♥") (public "🌎")
+            for icon in $icons
                 $name = '"' + icon[0] + '"'
                 &[data-slug={$name}]
                     a:before
