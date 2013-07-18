@@ -12,6 +12,7 @@ export interface AppTemplates {
     row: Hogan.Template
     table: Hogan.Template
     tags: Hogan.Template
+    tooltip: Hogan.Template
 }
 
 export class App {

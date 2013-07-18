@@ -9,6 +9,9 @@ module.exports = {
         "css": {
             "FoundationCSS": {
                 "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.css"
+            },
+            "Entypo": {
+                "path": "http://cdn.intermine.org/css/entypo/original/style.css"
             }
         },
         "js": {
@@ -39,10 +42,6 @@ module.exports = {
             "setImmediate": {
                 "path": "http://cdn.intermine.org/js/setImmediate/1.0.1/setImmediate.min.js"
             },
-            "Foundation": {
-                "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.js",
-                "depends": [ "jQuery" ]
-            },
             "Hogan": {
                 "path": "http://cdn.intermine.org/js/hogan.js/2.0.0/hogan.min.js"
             },
@@ -51,6 +50,10 @@ module.exports = {
             },
             "md5": {
                 "path": "http://cdn.intermine.org/js/md5/2.2/md5.min.js"
+            },
+            "_.slugify": {
+                "path": "http://cdn.intermine.org/js/underscore.string/2.3.0/underscore.string.min.js",
+                "depends": [ "_" ]
             }
         }
     },

@@ -6,7 +6,7 @@
 
 <ul class="side-nav">
 {{#tags}}
-    <li class="{{#active}}active{{/active}}" data-model="{{id}}">
+    <li class="{{#active}}active{{/active}}" data-model="{{id}}" data-slug="{{slug}}">
         <span class="color" style="background-color:rgb({{rgb}})"></span>
         <a>{{name}}</a>
     </li>

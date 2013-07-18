@@ -89,7 +89,10 @@ export class TableView extends d.DisposableView {
             // New View.
             var row: r.RowView = new r.RowView({
                 model: list,
-                template: this.opts.templates.row
+                templates: {
+                    row: this.opts.templates.row,
+                    tooltip: this.opts.templates.tooltip
+                }
             });
             // Push to stack.
             this.rows.push(row);

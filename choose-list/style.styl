@@ -15,6 +15,9 @@ table
     ul.tags
         float: right
 
+        li
+            position: relative
+
 span.color
     width: 12px
     height: 12px
@@ -46,7 +49,27 @@ div[data-view="tags"]
                     background: #FFF
                     margin: 2px
 
+            for icon in (favourite "♥") (public "🌎")
+                $name = '"' + icon[0] + '"'
+                &[data-slug={$name}]
+                    a:before
+                        font-family: Entypo
+                        font-size: 22px
+                        line-height: 1px
+                        margin-right: 3px
+                        vertical-align: middle
+                        display: inline-block
+                        content: icon[1]
+
 dl.sub-nav, ul.side-nav, ul.pagination, table thead
     -webkit-user-select: none
     -moz-user-select: none
     user-select: none
+
+.tooltip
+    display: block
+    width: auto
+    left: -4px
+    top: 20px
+    max-width: inherit
+    white-space: nowrap

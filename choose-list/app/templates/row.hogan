@@ -2,7 +2,9 @@
 <td>
     <ul class="tags">
         {{#tags}}
-            <li title="{{name}}"><span class="color" style="background-color:rgb({{rgb}})"></span></li>
+            <li data-model="{{id}}" data-slug="{{slug}}">
+                <span class="color" style="background-color:rgb({{rgb}})"></span>
+            </li>
         {{/tags}}
     </ul>
     <span class="title">{{name}}</span>

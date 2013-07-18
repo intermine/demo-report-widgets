@@ -1,4 +1,5 @@
 /// <reference path="../defs/lib.d.ts" />
+/// <reference path="../defs/underscore.d.ts" />
 /// <reference path="./sort.ts" />
 
 import s = module("./sort");
@@ -14,12 +15,25 @@ export interface TagInterface {
 export class Tag extends Backbone.Model implements TagInterface {
 
     get name(): string       { return this.get('name'); }
-    set name(value: string)  { this.set('name', value); }
+    set name(value: string)  {
+        // An intermine internal tag?
+        if (value.match(/^im:/)) {
+            value = value.replace(/^im:/, '');
+            this.set('im', true);
+        }
+
+        // Colorize, slugify, set us.
+        this.set({
+            rgb: Tag.colorize(value),
+            slug: _['string'].slugify(value), // FIXME
+            name: value
+        });
+    }
+    get im(): bool           { return this.get('im') || false; } // is only set when it exists
     set count(value: number) { this.set('count', value); }
     get count(): number      { return this.get('count'); }
     set active(value: bool)  { this.set('active', value); }
     get active(): bool       { return this.get('active'); }
-    set rgb(value: number[]) { this.set('rgb', value); }
     get rgb(): number[]      { return this.get('rgb'); }
 
     constructor(obj: TagInterface) {
@@ -33,9 +47,11 @@ export class Tag extends Backbone.Model implements TagInterface {
 
         // Init count.
         this.count = 1;
+    }
 
-        // Colorize.
-        this.rgb = Tag.colorize(obj.name);
+    // Check if a tag name matches (works out prefixes).
+    public isName(name: string): bool {
+        return name.replace(/^im:/, '') === this.name;
     }
 
     // Boost JSONification with our internal id.
@@ -70,7 +86,7 @@ export class Tags extends s.SortedCollection {
         // Do we have it?
         var tag: Tag;
         if (tag = <Tag> this.find(function(item: Tag) {
-            return item.name == obj.name;
+            return item.isName(obj.name);
         })) {
             tag.count += 1;
         } else {
