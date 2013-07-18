@@ -76,6 +76,8 @@ export class Tags extends s.SortedCollection {
 
     model: Tag;
 
+    private hidden: string[]; // hidden tags config
+
     initialize() {
         // By default sort on the count of lists with our tag.
         this.sortOrder = { key: 'count', direction: 1 };
@@ -83,6 +85,8 @@ export class Tags extends s.SortedCollection {
 
     // Add a new tag or increase count.
     add(obj: any): Tag {
+        console.log(this.hidden);
+
         // Do we have it?
         var tag: Tag;
         if (tag = <Tag> this.find(function(item: Tag) {
@@ -128,6 +132,11 @@ export class Tags extends s.SortedCollection {
         });
         // Trigger the event once?
         if (changed) this.trigger('change');
+    }
+
+    // Set tag labels that are to be hidden by default.
+    setHidden(hidden: string[]): void {
+        this.hidden = hidden;
     }
 
 }

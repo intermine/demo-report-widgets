@@ -4,7 +4,8 @@
 /// <reference path="./views/table.ts" />
 
 import l = module("./models/lists");
-import t = module("./views/table");
+import ta = module("./views/table");
+import tg = module("./models/tags");
 
 // All the config passed in.
 export interface AppConfig {
@@ -67,6 +68,14 @@ export class App {
         // Work starts here.
         this.cb(null, true, null);
 
+        // Any hidden tags to speak of?
+        if (this.config.provided
+            && this.config.provided.hidden
+            && this.config.provided.hidden instanceof Array)
+        {
+            tg.tags.setHidden(this.config.provided.hidden);
+        }
+
         // Get the user's lists.
         this.service.fetchLists((data: intermine.List[]) => {
             // For each list...
@@ -79,7 +88,7 @@ export class App {
             });
 
             // Construct a new View and dump it to the target.
-            var table = new t.TableView({
+            var table = new ta.TableView({
                 collection: l.lists,
                 config: this.config,
                 templates: this.templates

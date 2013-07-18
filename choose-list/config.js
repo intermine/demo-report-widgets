@@ -65,7 +65,7 @@ module.exports = {
         // Provided input, if any.
         'provided': {
             'list': 'My list', // a name of the list that is to be "highlighted"
-            'hidden': [ 'api' ] // hide lists tagged with this label
+            'hidden': [ 'public' ] // hide lists tagged with this label
         },
         // A callback called at least once.
         cb: function(err, working, list) {

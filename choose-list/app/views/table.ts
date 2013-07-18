@@ -45,14 +45,6 @@ export class TableView extends d.DisposableView {
         // All row views.
         this.rows = [];
 
-        // Any hidden tags to speak of?
-        if (this.opts.config.provided
-            && this.opts.config.provided.hidden
-            && this.opts.config.provided.hidden instanceof Array)
-        {
-            console.log(this.opts.config.provided);
-        }
-
         // Tags.
         this.tags = new tv.TagsView({
             collection: tm.tags,
