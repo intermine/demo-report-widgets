@@ -46,25 +46,27 @@ export class Lists extends s.SortedCollection {
                     return false;
                 })
             }
-            // Do we have this list already?
-            var list: List;
-            if (!this.find(function(list: List): bool {
-                // Flip the value.
+
+            // The flippant flipper... ha, and you were waiting for a sensible comment.
+            var flipper = function(list: List): bool {
+                // Ho-Chi, is that you?
                 if (list[obj.key] === obj.value) {
                     list.selected = !list.selected;
+
+                    // Say how many it makes? (when we can select more than 1 this will need to change this).
+                    m.mediator.trigger('selected:lists', +list.selected);
+
                     return true;
                 }
                 return false;
-            })) {
+            };
+
+            // Do we have this list already?
+            if (!this.find(flipper)) {
                 // We will select you when you arrive.
                 this.bind('add', function(list: List) {
-                    // Ho-Chi, is that you?
-                    if (list[obj.key] === obj.value) {
-                        // Change the Model.
-                        list.selected = !list.selected;
-                        // I am not listening anymore.
-                        this.off('add');
-                    }
+                    // I am not listening anymore?
+                    if (flipper(list)) this.off('add');
                 }, this);
             }
         }, this);

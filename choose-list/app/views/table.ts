@@ -54,6 +54,23 @@ export class TableView extends d.DisposableView {
 
         // Listen for all events here (like a boss).
         m.mediator.on('change:page change:sort change:tags', this.renderTable, this); // will get page number passed in
+
+        // Toggle the submit button based on how many lists are selected.
+        m.mediator.on('selected:lists', (count: number) => {
+            // Another flipper for you. An auto-arged one at that.
+            var flipper = (el: JQuery = $(this.el).find('#submit')) => {
+                el[!count ? 'addClass' : 'removeClass']('disabled');
+            };
+
+            // Are we rendered yet?
+            var submit;
+            if (!!(submit = $(this.el).find('#submit')).length) {
+                flipper(submit);
+            } else {
+                // Call a flipper later.
+                m.mediator.on('rendered:table', flipper, this);
+            }
+        }, this);
     }
 
     // Construct initially everything.
@@ -66,6 +83,9 @@ export class TableView extends d.DisposableView {
 
         // Table & paginator always go together.
         this.renderTable();
+
+        // I am rendered. You don't say.
+        m.mediator.trigger('rendered:table');
 
         // Chain.
         return this;
