@@ -2,10 +2,12 @@
 /// <reference path="defs/jquery.d.ts" />
 /// <reference path="./models/lists.ts" />
 /// <reference path="./views/table.ts" />
+/// <reference path="mediator" />
 
 import l = module("./models/lists");
 import ta = module("./views/table");
 import tg = module("./models/tags");
+import m = module("mediator");
 
 // All the config passed in.
 export interface AppConfig {
@@ -68,6 +70,12 @@ export class App {
         // Work starts here.
         this.cb(null, true, null);
 
+        // Listen for list submissions.
+        m.mediator.on('submit:list', (list: l.List) => {
+            this.cb(null, false, list.name);
+        }, this);
+
+        // Any user provided config?
         if (this.config.provided) {
             // Any hidden tags to speak of?
             if (this.config.provided.hidden && this.config.provided.hidden instanceof Array) {
@@ -75,7 +83,12 @@ export class App {
             }
             // Any selected list?
             if (this.config.provided.selected) {
-                l.lists.selected = this.config.provided.selected;
+                // Trigger an event (that Lists are listening to).
+                m.mediator.trigger('select:list', {
+                    key: 'name',
+                    value: this.config.provided.selected,
+                    force: false // no lists so do not deselect yet
+                });
             }
         }
 

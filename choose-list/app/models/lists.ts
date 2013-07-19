@@ -10,13 +10,17 @@ import p = module("./paginator");
 import t = module("./tags");
 import m = module("../mediator");
 
+interface SelectListMessage {
+    key: string
+    value: any
+    force: bool // force deselection of a previously selected list(s)?
+}
+
 // All the lists.
 export class Lists extends s.SortedCollection {
 
     model: List;
     paginator: p.Paginator;
-
-    public selected: string; // a selected list on us (once it arrives)
 
     initialize() {
         // By default sort on the date key.
@@ -30,16 +34,34 @@ export class Lists extends s.SortedCollection {
             // And then trigger our change...
             this.trigger('change');
         }, this);
-    }
 
-    // Select this list?
-    add(obj: any, opts?: any): void {
-        obj.selected = (obj.name === this.selected);
-
-        // Trigger an event?
-        if (obj.selected) m.mediator.trigger("selected:list");
-
-        s.SortedCollection['prototype'].add.call(this, obj, opts);
+        // Listen to this event.
+        m.mediator.on('select:list', (obj) => {
+            // Force deselecting all previous?
+            if (obj.force) {
+                // Do not assume just one List is selected...
+                this.forEach(function(list: List): void {
+                    if (list.selected) list.selected = false;
+                })
+            }
+            // Do we have this list already?
+            var list: List;
+            if (!this.find(function(list: List): bool {
+                // Select it and skip the rest then.
+                return (list[obj.key] === obj.value) ? list.selected = true : false;
+            })) {
+                // We will select you when you arrive.
+                this.bind('add', function(list: List) {
+                    // Ho-Chi, is that you?
+                    if (list[obj.key] === obj.value) {
+                        // Change the Model.
+                        list.selected = true;
+                        // I am not listening anymore.
+                        this.off('add');
+                    }
+                }, this);
+            }
+        }, this);
     }
 
     // Will return a particular "page" of a collection of only active lists.

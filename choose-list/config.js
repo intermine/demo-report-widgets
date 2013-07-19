@@ -54,6 +54,13 @@ module.exports = {
             "_.slugify": {
                 "path": "http://cdn.intermine.org/js/underscore.string/2.3.0/underscore.string.min.js",
                 "depends": [ "_" ]
+            },
+            "Chaplin": {
+                "path": "http://cdn.intermine.org/js/chaplin/0.10.0/chaplin.js",
+                "depends": [ "Backbone", "require" ]
+            },
+            "require": {
+                "path": "http://cdn.intermine.org/js/brunch/1.7.0-pre/require.js"
             }
         }
     },

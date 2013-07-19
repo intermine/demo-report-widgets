@@ -66,6 +66,20 @@ declare var async: Async;
 
 // Backbone 1.0.0 & Backbone-Relational 0.8.5
 declare module Backbone {
+    // It is a Module, not a Class!
+    export module Events {
+        function on(eventName: string, callback: (...args: any[]) => void , context?: any): any;
+        function off(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
+        function trigger(eventName: string, ...args: any[]): any;
+        function bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
+        function unbind(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
+
+        function once(events: string, callback: (...args: any[]) => void , context?: any): any;
+        function listenTo(object: any, events: string, callback: (...args: any[]) => void ): any;
+        function listenToOnce(object: any, events: string, callback: (...args: any[]) => void ): any;
+        function stopListening(object?: any, events?: string, callback?: (...args: any[]) => void ): any;
+    }
+
     export class Model {
         constructor (attr?, opts?);
         get(name: string): any;
@@ -102,6 +116,7 @@ declare module Backbone {
         // Events.
         bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
     }
+
     export class Collection {
         constructor (models?, opts?);
         model: any;
@@ -141,7 +156,9 @@ declare module Backbone {
         // Events.
         bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
         trigger(eventName: string, ...args: any[]): any;
+        off(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
     }
+
     export class View {
         constructor (opts?);
         el: HTMLElement;
@@ -152,33 +169,29 @@ declare module Backbone {
         render(): View;
         remove(): void;
         delegateEvents(events?: any): void;
-        undelegateEvent(): void;
+        undelegateEvents(): void;
         tagName: string;
         id: string;
         cid: string;
-    }
-    // It is a Module, not a Class!
-    export module Events {
-        function on(eventName: string, callback: (...args: any[]) => void , context?: any): any;
-        function off(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
-        function trigger(eventName: string, ...args: any[]): any;
-        function bind(eventName: string, callback: (...args: any[]) => void , context?: any): any;
-        function unbind(eventName?: string, callback?: (...args: any[]) => void , context?: any): any;
 
-        function once(events: string, callback: (...args: any[]) => void , context?: any): any;
-        function listenTo(object: any, events: string, callback: (...args: any[]) => void ): any;
-        function listenToOnce(object: any, events: string, callback: (...args: any[]) => void ): any;
-        function stopListening(object?: any, events?: string, callback?: (...args: any[]) => void ): any;
+        // Events.
+        stopListening(object?: any, events?: string, callback?: (...args: any[]) => void ): any;
     }
 
-    // The relational bits.
-    export class RelationalModel extends Model {
-        relations: any;
-    }
-    export class Relation extends Model {
+}
+
+// The little bowler hat man.
+declare module Chaplin {
+
+    export class Model extends Backbone.View {
 
     }
-    export class HasMany extends Relation {
 
+    export class View extends Backbone.View {
+        delegate(event: string, handler: Function);
+        delegate(event: string, selector: string, handler: Function);
+        listenTo(model: Backbone.Model, event: string, handler: Function);
+        listenTo(model: Chaplin.Model, event: string, handler: Function);
     }
+
 }

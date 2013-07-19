@@ -15,15 +15,21 @@ table
             cursor: pointer
 
     tbody
-        tr.selected
+        tr
+            &.selected
+                td
+                    background: #FFFFD4
+
             td
-                background: #FFFFD4
+                input[type="checkbox"]
+                    cursor: pointer
 
         ul.tags
             float: right
 
             li
                 position: relative
+                cursor: help
 
                 for icon in $icons
                     $name = '"' + icon[0] + '"'
@@ -37,7 +43,6 @@ table
                                 vertical-align: middle
                                 display: inline-block
                                 content: icon[1]
-                                font-weight: normal
 
 span.color
     width: 12px
@@ -94,6 +99,7 @@ dl.sub-nav, ul.side-nav, ul.pagination, table thead
     top: 20px
     max-width: inherit
     white-space: nowrap
+    font-weight: normal
 
 button#submit
     display: block

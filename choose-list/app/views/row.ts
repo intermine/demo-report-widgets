@@ -2,37 +2,52 @@
 /// <reference path="../defs/jquery.d.ts" />
 /// <reference path="./disposable.ts" />
 /// <reference path="../models/tags.ts" />
+/// <reference path="../models/lists" />
 
 import d = module("./disposable");
 import t = module("../models/tags");
+import l = module("../models/lists");
+
+export interface Templates {
+    row: Hogan.Template
+    tooltip: Hogan.Template
+}
 
 // A single row with our list.
-export class RowView extends d.DisposableView {
+export class RowView extends Chaplin.View {
 
     private model: Backbone.Model;
-    private templates: { row: Hogan.Template; tooltip: Hogan.Template };
+    private templates: Templates;
     private tooltip: { id: string; el: JQuery }; // tooltip rendered on us
 
     private events: any; // Backbone events on DOM
 
-    constructor(opts: any) {
-        this.tagName = "tr";
+    constructor(opts: {
+        model: l.List
+        templates: Templates
+        tagName?: string // not really provided just need a type
+    }) {
+        // Is a row...
+        opts.tagName = 'tr';
 
-        // Expand on us.
-        for (var key in opts) {
-            this[key] = opts[key];
-        }
+        super(opts);
 
-        // Onhover show tooltip with name of the tag.
-        this.events = {
-            'mouseover ul.tags li': 'showTooltip',
-            'mouseout ul.tags li': 'hideTooltip'
-        };
+        // Expand templates on us.
+        this.templates = opts.templates;
 
-        super();
+        // View events.
+        this.delegate('mouseover', 'ul.tags li', this.showTooltip);
+        this.delegate('mouseout', 'ul.tags li', this.hideTooltip);
+        this.delegate('click', 'input[type="checkbox"]', this.toggleList);
+
+        // Listen to when your Model changes.
+        this.listenTo(this.model, 'change', () => {
+            // Change our class as it is faster than re-render.
+            $(this.el)[ ((<l.List> this.model).selected) ? 'removeClass' : 'addClass' ]('selected');
+        });
     }
 
-    render(): RowView {
+    public render(): RowView {
         // Get them data.
         var data: any = this.model.toJSON(),
             date: Date = new Date(data.dateCreated);
@@ -78,6 +93,14 @@ export class RowView extends d.DisposableView {
             this.tooltip.el.remove();
             delete this.tooltip.id;
         }
+    }
+
+    // Select/deselect a list.
+    private toggleList(ev: Event): void {
+        // Change the model.
+        (<l.List> this.model).selected = <bool> $(ev.target).prop('checked');
+        // Just toggle the class since it is easier than re-rendering all Views again.
+        $(this.el).toggleClass('selected');
     }
 
 }
