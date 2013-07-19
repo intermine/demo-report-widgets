@@ -35,27 +35,33 @@ export class Lists extends s.SortedCollection {
             this.trigger('change');
         }, this);
 
-        // Listen to this event.
+        // Listen to this toggling event.
         m.mediator.on('select:list', (obj) => {
             // Force deselecting all previous?
             if (obj.force) {
                 // Do not assume just one List is selected...
-                this.forEach(function(list: List): void {
-                    if (list.selected) list.selected = false;
+                this.filter(function(list: List): bool {
+                    // Change to false state unless this is us.
+                    if (list[obj.key] !== obj.value && list.selected) list.selected = false;
+                    return false;
                 })
             }
             // Do we have this list already?
             var list: List;
             if (!this.find(function(list: List): bool {
-                // Select it and skip the rest then.
-                return (list[obj.key] === obj.value) ? list.selected = true : false;
+                // Flip the value.
+                if (list[obj.key] === obj.value) {
+                    list.selected = !list.selected;
+                    return true;
+                }
+                return false;
             })) {
                 // We will select you when you arrive.
                 this.bind('add', function(list: List) {
                     // Ho-Chi, is that you?
                     if (list[obj.key] === obj.value) {
                         // Change the Model.
-                        list.selected = true;
+                        list.selected = !list.selected;
                         // I am not listening anymore.
                         this.off('add');
                     }

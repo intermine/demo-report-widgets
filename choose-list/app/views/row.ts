@@ -3,10 +3,12 @@
 /// <reference path="./disposable.ts" />
 /// <reference path="../models/tags.ts" />
 /// <reference path="../models/lists" />
+/// <reference path="../mediator" />
 
 import d = module("./disposable");
 import t = module("../models/tags");
 import l = module("../models/lists");
+import m = module("../mediator");
 
 export interface Templates {
     row: Hogan.Template
@@ -40,11 +42,8 @@ export class RowView extends Chaplin.View {
         this.delegate('mouseout', 'ul.tags li', this.hideTooltip);
         this.delegate('click', 'input[type="checkbox"]', this.toggleList);
 
-        // Listen to when your Model changes.
-        this.listenTo(this.model, 'change', () => {
-            // Change our class as it is faster than re-render.
-            $(this.el)[ ((<l.List> this.model).selected) ? 'removeClass' : 'addClass' ]('selected');
-        });
+        // Listen to when your Model gets toggled (a self contained re-render change).
+        this.listenTo(this.model, 'change:selected', this.render);
     }
 
     public render(): RowView {
@@ -57,8 +56,8 @@ export class RowView extends Chaplin.View {
         // Render our template.
         $(this.el).html(this.templates.row.render(data));
 
-        // Selected list? Add a class on us.
-        if (data.selected) $(this.el).addClass('selected');
+        // Selected list? Add a class on us. Or not.
+        $(this.el)[(data.selected) ? 'addClass' : 'removeClass']('selected');
 
         // Chain.
         return this;
@@ -95,12 +94,14 @@ export class RowView extends Chaplin.View {
         }
     }
 
-    // Select/deselect a list.
+    // Select/deselect a list (LAX to SFO through LGW).
     private toggleList(ev: Event): void {
-        // Change the model.
-        (<l.List> this.model).selected = <bool> $(ev.target).prop('checked');
-        // Just toggle the class since it is easier than re-rendering all Views again.
-        $(this.el).toggleClass('selected');
+        // Trigger a toggling event on the list..
+        m.mediator.trigger('select:list', {
+            key: 'cid',
+            value: this.model.cid,
+            force: true
+        });
     }
 
 }
