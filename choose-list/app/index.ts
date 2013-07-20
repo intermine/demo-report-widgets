@@ -72,7 +72,7 @@ export class App {
 
         // Listen for list submissions.
         m.mediator.on('submit:list', (list: l.List) => {
-            this.cb(null, false, list.name);
+            this.cb(null, false, list.toJSON());
         }, this);
 
         // Any user provided config?
