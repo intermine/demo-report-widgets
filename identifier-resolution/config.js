@@ -7,7 +7,7 @@ module.exports = {
     "dependencies": {
         "css": {
             "FoundationCSS": {
-                "path": "http://cdn.intermine.org/css/foundation/4.2.2-prefixed/foundation.min.css"
+                "path": "http://cdn.intermine.org/css/foundation/4.2.2/foundation.min.css"
             }
         },
         "js": {

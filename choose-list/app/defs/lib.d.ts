@@ -194,6 +194,7 @@ declare module Chaplin {
         listenTo(model: Chaplin.Model, event: string, handler: Function);
         removeSubview(name: string);
         removeSubview(view: Chaplin.View);
+        dispose();
     }
 
 }
