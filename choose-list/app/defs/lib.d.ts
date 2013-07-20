@@ -192,6 +192,8 @@ declare module Chaplin {
         delegate(event: string, selector: string, handler: Function);
         listenTo(model: Backbone.Model, event: string, handler: Function);
         listenTo(model: Chaplin.Model, event: string, handler: Function);
+        removeSubview(name: string);
+        removeSubview(view: Chaplin.View);
     }
 
 }

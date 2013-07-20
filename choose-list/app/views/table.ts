@@ -21,7 +21,7 @@ import p = module("./paginator");
 import m = module("../mediator");
 
 // Complete table of all lists.
-export class TableView extends d.DisposableView {
+export class TableView extends Chaplin.View {
 
     private rows: r.RowView[]; // List Row views
     private tags: tv.TagsView; // a View of Tags
@@ -32,12 +32,6 @@ export class TableView extends d.DisposableView {
     private paginator: p.PaginatorView;
 
     constructor(opts?: any) {
-        // The DOM events.
-        this.events = {
-            'click thead th[data-sort]': 'sortTable',
-            'click #submit': 'submitList'
-        };
-
         super(opts);
 
         // Now save 'em.
@@ -51,6 +45,10 @@ export class TableView extends d.DisposableView {
             collection: tm.tags,
             template: this.opts.templates.tags
         });
+
+        // View events.
+        this.delegate('click', 'thead th[data-sort]', this.sortTable);
+        this.delegate('click', '#submit', this.submitList);
 
         // Listen for all events here (like a boss).
         m.mediator.on('change:page change:sort change:tags', this.renderTable, this); // will get page number passed in
@@ -103,7 +101,9 @@ export class TableView extends d.DisposableView {
         var fragment = document.createDocumentFragment();
 
         // Dispose of any previous rows.
-        this.disposeOf(this.rows);
+        this.rows.forEach((view: Chaplin.View) => {
+            this.removeSubview(view);
+        });
 
         // For each paginated active list...
         (<Backbone.Collection> this.collection).forEach((list: l.List) => {
