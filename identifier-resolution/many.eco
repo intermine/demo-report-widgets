@@ -1,10 +1,4 @@
 <div class="row">
-    <div class="large-12 columns">
-        <h1 class="title">Resolve identifiers</h1>
-        <p class="description">Type/paste in identifiers that are whitespace (space, tab, newline) separated.</p>
-    </div>
-</div>
-<div class="row">
     <form class="custom">
         <div class="large-6 columns">
             <label>List of identifiers</label>
