@@ -76,13 +76,13 @@ export class App {
         }, this);
 
         // Any user provided config?
-        if (this.config.provided) {
+        if (_.isObject(this.config.provided)) {
             // Any hidden tags to speak of?
-            if (this.config.provided.hidden && this.config.provided.hidden instanceof Array) {
+            if (_.isArray(this.config.provided.hidden)) {
                 tg.tags.hidden = this.config.provided.hidden;
             }
             // Any selected list?
-            if (this.config.provided.selected) {
+            if (_.isString(this.config.provided.selected)) {
                 // Trigger an event (that Lists are listening to).
                 m.mediator.trigger('select:list', {
                     key: 'name',

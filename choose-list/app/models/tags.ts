@@ -79,6 +79,8 @@ export class Tags extends s.SortedCollection {
     public hidden: string[]; // hidden tags config
 
     initialize() {
+        // Empty by default.
+        this.hidden = [];
         // By default sort on the count of lists with our tag.
         this.sortOrder = { key: 'count', direction: 1 };
     }
