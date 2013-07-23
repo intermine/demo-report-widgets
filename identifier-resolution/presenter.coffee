@@ -85,7 +85,7 @@ class Form extends Backbone.View
         (query, cb) ->
             query.saveAsList
                 'name': +new Date
-                'tags': [ 'app/a', 'identifier-resolution' ]
+                'tags': [ 'app', 'identifier-resolution' ]
             , (list) ->
                 out.list = list.name
                 cb null
