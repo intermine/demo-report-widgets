@@ -76,13 +76,11 @@ class Form extends Backbone.View
 
                 cb null, query
 
-        # Turn a Query into a Query Object.
-        (query, cb) ->
-            self.service.query query, (q) ->
-                cb null, q
-
+        # Call back with the JSON query and original input.
         ], (err, q) ->
-            self.config.cb err, false, q
+            self.config.cb err, false,
+                'input': input
+                'query': q
 
 # This is my app definition, needs to have a set signature.
 class exports.App

@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Resolve Identifiers",
     "description": "Resolve a bunch of identifiers in InterMine and return a PathQuery",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "dependencies": {
         "css": {
             "FoundationCSS": {
@@ -65,13 +65,13 @@ module.exports = {
             'organism': 'C. elegans'
         },
         // A callback called at least once.
-        cb: function(err, working, query) {
+        cb: function(err, working, out) {
             // Has error happened?
             if (err) throw err;
             // Are you working?
             console.log('working:', working);
-            // Are you done? Dump the query then.
-            console.log('query:', query);
+            // Are you done? Dump the output then.
+            console.log('query:', out);
         },
         
         // Pass this from your middleware that knows about the mine it connects to.
