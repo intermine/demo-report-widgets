@@ -27,7 +27,7 @@ class Form extends Backbone.View
             value.split /\s/g          # split on whitespace
 
         # Expose the input "globally".
-        input = {}
+        out = 'input': {}
 
         # Work starts here.
         self.config.cb null, true
@@ -35,14 +35,14 @@ class Form extends Backbone.View
         # Get the form.
         async.waterfall [ (cb) ->
             # Get the identifiers.
-            input.identifiers = clean $(self.el).find('form *[name="input"]').val()
+            out.input.identifiers = clean $(self.el).find('form *[name="input"]').val()
 
             # Do we have any?
-            return cb 'No identifiers have been provided' if input.identifiers.length is 0
+            return cb 'No identifiers have been provided' if out.input.identifiers.length is 0
 
             # Get the DOM data.
-            input.organism = $(self.el).find('form select[name="organism"]').val()
-            input.type = $(self.el).find('form select[name="type"]').val()
+            out.input.organism = $(self.el).find('form select[name="organism"]').val()
+            out.input.type = $(self.el).find('form select[name="type"]').val()
 
             # Next.
             cb null
@@ -50,9 +50,9 @@ class Form extends Backbone.View
         # Upload IDs.
         (cb) ->
             (self.service.resolveIds
-                'identifiers': input.identifiers
-                'type':        input.type
-                'extra':       input.organism
+                'identifiers': out.input.identifiers
+                'type':        out.input.type
+                'extra':       out.input.organism
             ).then (job) ->
                 cb null, job
 
@@ -65,22 +65,34 @@ class Form extends Backbone.View
                 # Do we have anything?
                 return cb 'No identifiers were resolved' if keys.length is 0
         
-               # Form a query.
-                query =
+                # Form a query.
+                out.query =
                     'select': [
-                        "#{input.type}.*"
+                        "#{out.input.type}.*"
                     ]
                     'constraints': [
-                        { 'path': "#{input.type}.id", 'op': 'ONE OF', 'values': keys }
+                        { 'path': "#{out.input.type}.id", 'op': 'ONE OF', 'values': keys }
                     ]
 
+                cb null
+
+        # Turn into a query object.
+        (cb) ->
+            self.service.query out.query, (query) ->
                 cb null, query
 
-        # Call back with the JSON query and original input.
-        ], (err, q) ->
-            self.config.cb err, false,
-                'input': input
-                'query': q
+        # Turn into a list.
+        (query, cb) ->
+            query.saveAsList
+                'name': +new Date
+                'tags': [ 'temp' ]
+            , (list) ->
+                out.list = list.name
+                cb null
+
+        # Call back with the input and output.
+        ], (err) ->
+            self.config.cb err, false, out
 
 # This is my app definition, needs to have a set signature.
 class exports.App
@@ -93,6 +105,7 @@ class exports.App
         # Point to the mine's service.
         @service = new intermine.Service
             'root': @config.mine
+            'token': @config.token
             'errorHandler': @config.cb # first param passed to errorHandler is the error
 
     # Render accepts a target to draw results into.

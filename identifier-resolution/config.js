@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Resolve Identifiers",
     "description": "Resolve a bunch of identifiers in InterMine and return a PathQuery",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "dependencies": {
         "css": {
             "FoundationCSS": {
@@ -51,6 +51,7 @@ module.exports = {
     "config": {
         // Pass the following to the App from the client.
         'mine': 'http://beta.flymine.org/beta', // which mine to connect to
+        'token': 'X133AbT7J0Z0HfV316Q4', // token so we can access private lists
         'type': 'many', // one OR many
         // Defaults in the forms.
         'defaults': {
