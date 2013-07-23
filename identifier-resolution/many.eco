@@ -2,7 +2,7 @@
     <form class="custom">
         <div class="large-6 columns">
             <label>List of identifiers</label>
-            <textarea name="input" placeholder="<%= @defaults.identifiers.join(' ') %>"><%= @provided?.identifiers.join(' ') %></textarea>
+            <textarea name="input" placeholder="<%= @defaults.identifiers.join(' ') %>"><%= @provided?.identifiers?.join(' ') %></textarea>
         </div>
         <div class="large-3 columns">
             <label>Type</label>
