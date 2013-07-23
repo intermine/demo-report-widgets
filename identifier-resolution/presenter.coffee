@@ -35,10 +35,10 @@ class Form extends Backbone.View
         # Get the form.
         async.waterfall [ (cb) ->
             # Get the identifiers.
-            input.ids = clean $(self.el).find('form *[name="input"]').val()
+            input.identifiers = clean $(self.el).find('form *[name="input"]').val()
 
             # Do we have any?
-            return cb 'No identifiers have been provided' if input.ids.length is 0
+            return cb 'No identifiers have been provided' if input.identifiers.length is 0
 
             # Get the DOM data.
             input.organism = $(self.el).find('form select[name="organism"]').val()
@@ -50,7 +50,7 @@ class Form extends Backbone.View
         # Upload IDs.
         (cb) ->
             (self.service.resolveIds
-                'identifiers': input.ids
+                'identifiers': input.identifiers
                 'type':        input.type
                 'extra':       input.organism
             ).then (job) ->
