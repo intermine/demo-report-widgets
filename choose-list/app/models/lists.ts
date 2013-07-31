@@ -24,7 +24,7 @@ export class Lists extends s.SortedCollection {
 
     initialize() {
         // By default sort on the date key.
-        this.sortOrder = { key: 'dateCreated', direction: -1 };
+        this.sortOrder = { key: 'timestamp', direction: -1 };
 
         // Init paginator (disregard the fn name).
         this.paginator = new p.Paginator({ perPage: 10 });

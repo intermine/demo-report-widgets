@@ -7,7 +7,7 @@
                     <th><span class="check-all"></span></th>
                     <th data-sort="title"><a>Title</a></th>
                     <th>Owner</th>
-                    <th data-sort="dateCreated"><a>Created</a></th>
+                    <th data-sort="timestamp"><a>Created</a></th>
                 </tr>
             </thead>
             <tbody data-view="rows"></tbody>
