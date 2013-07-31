@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Choose a list",
     "description": "Choose from among InterMine lists user has access to",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "appRoot": "app/index",
     "dependencies": {
         "css": {

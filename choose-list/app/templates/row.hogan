@@ -10,5 +10,4 @@
     <span class="title">{{name}}</span>
     <span class="description">{{description}}</span>
 </td>
-<td><span class="owner"></span></td>
 <td><span class="created" title="{{prettyDate}}">{{timeAgo}}</span></td>
