@@ -199,3 +199,19 @@ declare module Chaplin {
     }
 
 }
+
+// gf3/Levenshtein
+declare class Levenshtein {
+    constructor (a: string, b: string);
+    distance: number;
+}
+
+// K-means clustering.
+declare module clusterfck {
+    export function kmeans(vectors: number[][], size: number): any;
+}
+
+// ColorBrewer.
+declare module colorbrewer {
+    export var RdYlGn: any;
+}

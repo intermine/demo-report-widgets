@@ -1,14 +1,15 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
 /// <reference path="./sort.ts" />
+/// <reference path="../utils/colorize.ts" />
 
 import s = module("./sort");
+import c = module("../utils/colorize");
 
 export interface TagInterface {
     name: string; // tag name, not using internal id!
     count: number; // how many times used
     active: bool; // actively selected in UI?
-    rgb: number[]; // colorized string
 }
 
 // One tag.
@@ -22,19 +23,20 @@ export class Tag extends Backbone.Model implements TagInterface {
             this.set('im', true);
         }
 
-        // Colorize, slugify, set us.
+        // Slugify, set us.
         this.set({
-            rgb: Tag.colorize(value),
             slug: _['string'].slugify(value), // FIXME
             name: value
         });
+
+        // Add us for colorization.
+        c.colorize.add(value);
     }
     get im(): bool           { return this.get('im') || false; } // is only set when it exists
     set count(value: number) { this.set('count', value); }
     get count(): number      { return this.get('count'); }
     set active(value: bool)  { this.set('active', value); }
     get active(): bool       { return this.get('active'); }
-    get rgb(): number[]      { return this.get('rgb'); }
 
     constructor(obj: TagInterface) {
         super();
@@ -54,19 +56,12 @@ export class Tag extends Backbone.Model implements TagInterface {
         return name.replace(/^im:/, '') === this.name;
     }
 
-    // Boost JSONification with our internal id.
+    // Boost JSONification with our internal id and color.
     public toJSON(): any {
-        return _.extend(Backbone.Model['prototype'].toJSON.call(this), { id: this.cid });
-    }
-
-    // Return a color for a string.
-    private static colorize(text: string): number[] {
-        var hash = md5(text);
-        return [
-            parseInt(hash.slice(0, 2), 16),
-            parseInt(hash.slice(1, 3), 16),
-            parseInt(hash.slice(2, 4), 16)
-        ];
+        return _.extend(Backbone.Model['prototype'].toJSON.call(this), {
+            id: this.cid,
+            color: c.colorize.get(this.name)
+        });
     }
 
 }

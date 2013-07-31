@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Choose a list",
     "description": "Choose from among InterMine lists user has access to",
-    "version": "0.1.3",
+    "version": "0.2.0",
     "appRoot": "app/index",
     "dependencies": {
         "css": {
@@ -48,9 +48,6 @@ module.exports = {
             "moment": {
                 "path": "http://cdn.intermine.org/js/moment.js/2.0.0/moment.min.js"
             },
-            "md5": {
-                "path": "http://cdn.intermine.org/js/md5/2.2/md5.min.js"
-            },
             "_.slugify": {
                 "path": "http://cdn.intermine.org/js/underscore.string/2.3.0/underscore.string.min.js",
                 "depends": [ "_" ]
@@ -61,6 +58,15 @@ module.exports = {
             },
             "require": {
                 "path": "http://cdn.intermine.org/js/brunch/1.7.0-pre/require.js"
+            },
+            "colorbrewer": {
+                "path": "http://cdn.intermine.org/js/colorbrewer/1.0.0/colorbrewer.min.js"
+            },
+            "clusterfck": {
+                "path": "http://cdn.intermine.org/js/clusterfck/0.5.1/clusterfck.js"
+            },
+            "Levenshtein": {
+                "path": "http://cdn.intermine.org/js/levenshtein/1.0.2/levenshtein.js"
             }
         }
     },

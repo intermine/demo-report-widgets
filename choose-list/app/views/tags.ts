@@ -28,7 +28,7 @@ export class TagsView extends Backbone.View {
 
         this.template = opts.template;
 
-        // Re-render us when out collection changes.
+        // Re-render us when our collection changes.
         (<Backbone.Collection> this.collection).bind('change', this.render, this);
     }
 
