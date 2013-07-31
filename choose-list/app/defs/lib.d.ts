@@ -14,6 +14,7 @@ declare module Hogan {
 // Moment.
 interface Moment {
     fromNow(): string;
+    format(): string;
 }
 interface MomentStatic {
     (date: Date): Moment;

@@ -109,7 +109,7 @@ export class Lists extends s.SortedCollection {
 }
 
 export interface ListInterface {
-    dateCreated: number;
+    timestamp: number;
     description: string;
     name: string;
     size: number;
@@ -121,8 +121,8 @@ export interface ListInterface {
 // Single row Model.
 export class List extends Backbone.Model implements ListInterface {
 
-    get dateCreated(): number      { return this.get('dateCreated'); }
-    set dateCreated(value: number) { this.set('dateCreated', value); }
+    get timestamp(): number        { return this.get('timestamp'); }
+    set timestamp(value: number)   { this.set('timestamp', value); }
     get description(): string      { return this.get('description'); }
     set description(value: string) { this.set('description', value); }
     get name(): string             { return this.get('name'); }
@@ -155,7 +155,6 @@ export class List extends Backbone.Model implements ListInterface {
     // Convert an intermine.List into a proper Model.
     constructor(list: intermine.List) {
         super();
-
         // Save them all, but only some will make it to our Model proper.
         for (var key in list) {
             switch (key) {

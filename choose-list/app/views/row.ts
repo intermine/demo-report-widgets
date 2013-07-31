@@ -48,10 +48,13 @@ export class RowView extends Chaplin.View {
 
     public render(): RowView {
         // Get them data.
-        var data: any = this.model.toJSON(),
-            date: Date = new Date(data.dateCreated);
-        // Boost with time ago.
-        data.timeAgo = moment(date).fromNow();
+        var data: any = this.model.toJSON();
+        // Boost with formatted times.
+        var time: Moment = moment(data.timestamp);
+        _.extend(data, {
+            timeAgo: time.fromNow(),
+            prettyDate: time.format()
+        });
 
         // Render our template.
         $(this.el).html(this.templates.row.render(data));
