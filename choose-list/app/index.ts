@@ -3,13 +3,11 @@
 /// <reference path="./models/lists.ts" />
 /// <reference path="./views/table.ts" />
 /// <reference path="mediator" />
-/// <reference path="./utils/colorize.ts" />
 
 import l = module("./models/lists");
 import ta = module("./views/table");
 import tg = module("./models/tags");
 import m = module("mediator");
-import c = module("./utils/colorize");
 
 // All the config passed in.
 export interface AppConfig {
@@ -112,8 +110,8 @@ export class App {
                 l.lists.add(list);
             });
 
-            // Colorize them all after we have added all the lists.
-            c.colorize.run();
+            // Colorize all them tags after we have added all the lists.
+            m.mediator.trigger('added:tags');
 
             // Now we can safely render.
             $(target).html((<Backbone.View> table.render()).el);

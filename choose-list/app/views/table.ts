@@ -26,7 +26,6 @@ export class TableView extends Chaplin.View {
     private rows: r.RowView[]; // List Row views
     private tags: tv.TagsView; // a View of Tags
     private collection: l.Lists; // all them lists, nicely attached here
-    private events: any; // Backbone events on DOM
     private opts: any; // not saving them straight from constructor as we need to attach events first
     private sortOrder: s.SortInterface; // keep track of previous sort order to do direction
     private paginator: p.PaginatorView;

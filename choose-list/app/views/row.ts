@@ -4,11 +4,13 @@
 /// <reference path="../models/tags.ts" />
 /// <reference path="../models/lists" />
 /// <reference path="../mediator" />
+/// <reference path="../utils/colors" />
 
 import d = module("./disposable");
 import t = module("../models/tags");
 import l = module("../models/lists");
 import m = module("../mediator");
+import c = module("../utils/colors");
 
 export interface Templates {
     row: Hogan.Template
@@ -49,6 +51,22 @@ export class RowView extends Chaplin.View {
     public render(): RowView {
         // Get them data.
         var data: any = this.model.toJSON();
+        if (data.tags) {
+            // Sort tags alphabetically.
+            (<t.Tag[]> data.tags).sort(function(a: t.Tag, b: t.Tag) {
+                // Not exactly a Tag, but close enough...
+                return a.slug.localeCompare(b.slug);
+            });
+            // Darken color.
+            data.tags = _.map(data.tags, function(tag: any) {
+                var before: string = tag.color;
+                tag.color = {
+                    background: before,
+                    border: c.darken(before, { val: 20, type: '%' })
+                };
+                return tag;
+            });
+        }
         // Boost with formatted times.
         var time: Moment = moment(data.timestamp);
         _.extend(data, {

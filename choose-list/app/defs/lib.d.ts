@@ -214,4 +214,5 @@ declare module clusterfck {
 // ColorBrewer.
 declare module colorbrewer {
     export var RdYlGn: any;
+    export var Paired: any;
 }

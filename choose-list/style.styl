@@ -11,8 +11,12 @@ table
     width: 100%
 
     thead
-        th[data-sort]
-            cursor: pointer
+        th
+            &[data-sort]
+                cursor: pointer
+
+            &.minimal
+                width: 1%
 
     tbody
         tr
@@ -22,7 +26,15 @@ table
 
             td
                 input[type="checkbox"]
+                    vertical-align: middle
                     cursor: pointer
+
+                span
+                    &.created
+                        white-space: nowrap
+
+                    &.title
+                        line-height: 22px
 
         ul.tags
             float: right
@@ -51,6 +63,8 @@ span.color
     border-radius: 50%
     display: block
     float: left
+    border-width: 2px
+    border-style: solid
 
 div[data-view="tags"]
     dl.sub-nav
@@ -74,7 +88,6 @@ div[data-view="tags"]
                     border-radius: 50%
                     display: block
                     background: #FFF
-                    margin: 2px
 
             for icon in $icons
                 $name = '"' + icon[0] + '"'

@@ -3,7 +3,12 @@
     <ul class="tags">
         {{#tags}}
             <li data-model="{{id}}" data-slug="{{slug}}">
-                <span class="color" style="background-color:{{color}}"></span>
+                <span class="color" style="
+                    {{#color}}
+                        background-color:{{background}};
+                        border-color:{{border}};
+                    {{/color}}
+                "></span>
             </li>
         {{/tags}}
     </ul>

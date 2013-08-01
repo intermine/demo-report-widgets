@@ -2,9 +2,11 @@
 /// <reference path="../defs/jquery.d.ts" />
 /// <reference path="../models/tags.ts" />
 /// <reference path="../mediator" />
+/// <reference path="../utils/colors" />
 
 import t = module("../models/tags");
 import m = module("../mediator");
+import c = module("../utils/colors");
 
 // Encapsulates all tags in a sidebar.
 export class TagsView extends Backbone.View {
@@ -28,14 +30,22 @@ export class TagsView extends Backbone.View {
 
         this.template = opts.template;
 
-        // Re-render us when our collection changes.
-        (<Backbone.Collection> this.collection).bind('change', this.render, this);
+        // Re-render on mediator event (less work).
+        m.mediator.on('change:tags', this.render, this);
     }
 
     render(): TagsView {
         // Render the whole collection in one template.
         $(this.el).html(this.template.render({
-            tags: (<Backbone.Collection> this.collection).toJSON(),
+            tags: _.map((<Backbone.Collection> this.collection).toJSON(), function(tag: any) {
+                // Darken color.
+                var before: string = tag.color;
+                tag.color = {
+                    background: before,
+                    border: c.darken(before, { val: 20, type: '%' })
+                };
+                return tag;
+            }),
             // Are all tags active?
             allActive: () => {
                 return this.collection.every('active', true);

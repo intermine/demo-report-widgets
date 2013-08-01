@@ -32,6 +32,7 @@ export class Tag extends Backbone.Model implements TagInterface {
         // Add us for colorization.
         c.colorize.add(value);
     }
+    get slug(): string       { return this.get('slug'); }
     get im(): bool           { return this.get('im') || false; } // is only set when it exists
     set count(value: number) { this.set('count', value); }
     get count(): number      { return this.get('count'); }
@@ -67,7 +68,7 @@ export class Tag extends Backbone.Model implements TagInterface {
 }
 
 // All the tags, coming from Lists.
-export class Tags extends s.SortedCollection {
+export class Tags extends Backbone.Collection {
 
     model: Tag;
 
@@ -76,8 +77,11 @@ export class Tags extends s.SortedCollection {
     initialize() {
         // Empty by default.
         this.hidden = [];
-        // By default sort on the count of lists with our tag.
-        this.sortOrder = { key: 'count', direction: 1 };
+    }
+
+    // By default sort on the count of lists with our tag.
+    comparator(tag: Tag) {
+        return - tag.count;
     }
 
     // Add a new tag or increase count.
@@ -93,7 +97,7 @@ export class Tags extends s.SortedCollection {
             obj.active = this.hidden.indexOf(obj.name) == -1;
             // Add.
             tag = new Tag(obj);
-            s.SortedCollection['prototype'].add.call(this, tag);
+            Backbone.Collection['prototype'].add.call(this, tag);
             // Backbone.Collection.prototype.add.call(this, tag, { sort: false });
         }
 

@@ -1,5 +1,8 @@
 /// <reference path="../defs/lib.d.ts" />
 /// <reference path="../defs/underscore.d.ts" />
+/// <reference path="../mediator" />
+
+import m = module("../mediator");
 
 interface ColorMap {
     [key: string]: string;
@@ -9,9 +12,14 @@ export class Colorize {
 
     private map: ColorMap;
 
+    // http://bl.ocks.org/mbostock/5577023
+    private scheme = 'Paired';
+
     // Init a new list for colorization.
     constructor() {
         this.map = {};
+        // Start listening for when all tags are added.
+        m.mediator.on('added:tags', this.run, this);
     }
 
     // Add text to a list to be colorized.
@@ -38,12 +46,22 @@ export class Colorize {
     // Colorize them all.
     public run(): void {
         // How many ColorBrewer colors are we going for?
+        var min = +Infinity,
+            max = -Infinity;
+        _.forEach(_.keys(colorbrewer[this.scheme]), function(el: string) {
+            var value: number = parseInt(el);
+            if (value > max) max = value;
+            if (value < min) min = value;
+        });
+
+        if (min == +Infinity || max == -Infinity) return;
+
         var keys: string[] = _.keys(this.map),
             size: number = keys.length,
-            count: number = 11;
-        if (size >= 3 && size < 11) count = size;
+            count: number = max;
+        if (size >= min && size < max) count = size;
 
-        // TODO: skip clustering if count <= 11
+        // TODO: skip clustering if count <= max
 
         // Create a distance vector for each key.
         var vectors: number[][] = [];
@@ -70,7 +88,7 @@ export class Colorize {
                 }
 
                 // Save the color.
-                (<Colorize> this).map[keys[j]] = colorbrewer.RdYlGn[count][i];
+                (<Colorize> this).map[keys[j]] = colorbrewer[this.scheme][count][i];
                 // Remove to reduce search space.
                 vectors.splice(j, 1);
                 keys.splice(j, 1);
