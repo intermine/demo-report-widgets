@@ -20,5 +20,41 @@ module.exports = {
                 "depends": [ "jQuery", "_" ]
             }
         }
+    },
+    // Example config. Pass this from your middleware that knows about the mine it connects to.
+    "config": {
+        "mine": "http://www.flymine.org/query",
+        "pathQueries": {
+            "alleleTerms": {
+                "select": [
+                    "Gene.symbol"
+                    "Gene.alleles.id"
+                    "Gene.alleles.genotypes.id"
+                    "Gene.alleles.genotypes.phenotypeTerms.id"
+                    "Gene.alleles.genotypes.phenotypeTerms.name"
+                ],
+                "constraints": []
+            },
+            "highLevelTerms": {
+                "select": [
+                    "Allele.highLevelPhenotypeTerms.name"
+                    "Allele.highLevelPhenotypeTerms.relations.childTerm.name"
+                ],
+                "constraints": []
+            },
+            "alleles": {
+                "select": [
+                    "Gene.alleles.genotypes.phenotypeTerms.name"
+                    "Gene.alleles.symbol"
+                    "Gene.alleles.primaryIdentifier"
+                    "Gene.alleles.name"
+                    "Gene.alleles.type"
+                    "Gene.alleles.genotypes.geneticBackground"
+                    "Gene.alleles.genotypes.zygosity"
+                    "Gene.alleles.organism.name"
+                ],
+                "constraints": []
+            }
+        }
     }
 };

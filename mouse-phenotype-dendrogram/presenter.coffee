@@ -16,43 +16,11 @@ Set the assertion on the window object.
 # This class encapsulates the App behavior.
 class exports.App
 
-    # PathQueries to fetch the allele terms for a symbol and high level terms for these terms.
-    pq:
-        alleleTerms:
-            "select": [
-                "Gene.symbol"
-                "Gene.alleles.id"
-                "Gene.alleles.genotypes.id"
-                "Gene.alleles.genotypes.phenotypeTerms.id"
-                "Gene.alleles.genotypes.phenotypeTerms.name"
-            ],
-            "constraints": []
-        
-        highLevelTerms:
-            "select": [
-                "Allele.highLevelPhenotypeTerms.name"
-                "Allele.highLevelPhenotypeTerms.relations.childTerm.name"
-            ],
-            "constraints": []
-
-        alleles:
-            "select": [
-                "Gene.alleles.genotypes.phenotypeTerms.name"
-                "Gene.alleles.symbol"
-                "Gene.alleles.primaryIdentifier"
-                "Gene.alleles.name"
-                "Gene.alleles.type"
-                "Gene.alleles.genotypes.geneticBackground"
-                "Gene.alleles.genotypes.zygosity"
-                "Gene.alleles.organism.name"
-            ],
-            "constraints": []
-
     # Fetch phenotypic terms for PPARG mouse.
     alleleTerms: (cb) ->
         assert @config.symbol?, '`symbol` of the gene in question not provided'
 
-        pq = @pq.alleleTerms
+        pq = @config.pathQueries.alleleTerms
 
         # First remove any constraints on a symbol already present as pq is q shallow copy and we reuse this.
         for i in [0...pq.constraints.length]
@@ -93,7 +61,7 @@ class exports.App
         assert @config.symbol?, '`symbol` of the gene in question not provided'
         assert @band?, '`band` of allele counts not provided'
 
-        pq = @pq.highLevelTerms
+        pq = @config.pathQueries.highLevelTerms
         
         # First remove any constraints on a symbol already present as pq is q shallow copy and we reuse this.
         for i in [0...pq.constraints.length]
@@ -134,7 +102,7 @@ class exports.App
 
     # Create a new service connection.
     constructor: (@config, @templates) ->
-        @service = new intermine.Service 'root': 'http://metabolicmine.org/beta/service/'
+        @service = new intermine.Service 'root': @config.mine
 
     # Render the graph.
     render: (@target) ->
@@ -261,7 +229,7 @@ class exports.App
                 # Leaf node.
                 when 'leaf'
                     # Constrain the PQ.
-                    pq = @pq.alleles
+                    pq = @config.pathQueries.alleles
                     pq.constraints = [] # clear any previous
                     pq.constraints.push
                         "path": "Gene.alleles.genotypes.phenotypeTerms.name"
