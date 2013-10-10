@@ -23,7 +23,7 @@ module.exports = {
     },
     // Example config. Pass this from your middleware that knows about the mine it connects to.
     "config": {
-        "mine": "http://www.flymine.org/query",
+        "mine": "http://metabolicmine.org/beta/service/",
         "pathQueries": {
             "alleleTerms": {
                 "select": [
