@@ -27,30 +27,30 @@ module.exports = {
         "pathQueries": {
             "alleleTerms": {
                 "select": [
-                    "Gene.symbol"
-                    "Gene.alleles.id"
-                    "Gene.alleles.genotypes.id"
-                    "Gene.alleles.genotypes.phenotypeTerms.id"
+                    "Gene.symbol",
+                    "Gene.alleles.id",
+                    "Gene.alleles.genotypes.id",
+                    "Gene.alleles.genotypes.phenotypeTerms.id",
                     "Gene.alleles.genotypes.phenotypeTerms.name"
                 ],
                 "constraints": []
             },
             "highLevelTerms": {
                 "select": [
-                    "Allele.highLevelPhenotypeTerms.name"
+                    "Allele.highLevelPhenotypeTerms.name",
                     "Allele.highLevelPhenotypeTerms.relations.childTerm.name"
                 ],
                 "constraints": []
             },
             "alleles": {
                 "select": [
-                    "Gene.alleles.genotypes.phenotypeTerms.name"
-                    "Gene.alleles.symbol"
-                    "Gene.alleles.primaryIdentifier"
-                    "Gene.alleles.name"
-                    "Gene.alleles.type"
-                    "Gene.alleles.genotypes.geneticBackground"
-                    "Gene.alleles.genotypes.zygosity"
+                    "Gene.alleles.genotypes.phenotypeTerms.name",
+                    "Gene.alleles.symbol",
+                    "Gene.alleles.primaryIdentifier",
+                    "Gene.alleles.name",
+                    "Gene.alleles.type",
+                    "Gene.alleles.genotypes.geneticBackground",
+                    "Gene.alleles.genotypes.zygosity",
                     "Gene.alleles.organism.name"
                 ],
                 "constraints": []
