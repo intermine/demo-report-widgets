@@ -24,7 +24,7 @@ module.exports = {
     },
     // Example config. Pass this from your middleware that knows about the mine it connects to.
     "config": {
-        "mine": "http://beta.flymine.org/beta",
+        "mine": "http://www.flymine.org/query",
         "pathQueries": {
             "pubsForGene": {
                 "select": [

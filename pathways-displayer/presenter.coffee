@@ -22,7 +22,7 @@ $ = jQuery or Zepto
 class exports.App
 
     constructor: (@config, @templates) ->
-        @service = new intermine.Service 'root': 'http://beta.flymine.org/beta'
+        @service = new intermine.Service 'root': 'http://www.flymine.org/query'
 
     render: (@el) ->
         # Init the `Grid`.

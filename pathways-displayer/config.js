@@ -32,7 +32,7 @@ module.exports = {
     // Example config. Pass this from your middleware that knows about the mine it connects to.
     "config": {
         "mines": {
-            "FlyMine": "http://beta.flymine.org/beta",
+            "FlyMine": "http://www.flymine.org/query",
             "metabolicMine": "http://metabolicmine.org/beta"
         },
         "organisms": [

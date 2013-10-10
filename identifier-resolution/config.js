@@ -50,7 +50,7 @@ module.exports = {
     // Example config.
     "config": {
         // Pass the following to the App from the client.
-        'mine': 'http://beta.flymine.org/beta', // which mine to connect to
+        'mine': 'http://www.flymine.org/query', // which mine to connect to
         'token': 'X133AbT7J0Z0HfV316Q4', // token so we can access private lists
         'type': 'many', // one OR many
         // Defaults in the forms.
