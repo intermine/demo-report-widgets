@@ -59,12 +59,15 @@ class Form extends Backbone.View
         # Poll for job results.
         (job, cb) ->
             job.poll().then (results) ->
-                # Just get the keys.
-                keys = _.keys results
+                # Save all of the results.
+                out.results = results
 
-                # Do we have anything?
-                return cb 'No identifiers were resolved' if keys.length is 0
-        
+                # Get the good match keys.
+                keys = do results.goodMatchIds
+
+                # Skip if no matches.
+                return cb null unless keys.length
+
                 # Form a query.
                 out.query =
                     'select': [
@@ -74,20 +77,6 @@ class Form extends Backbone.View
                         { 'path': "#{out.input.type}.id", 'op': 'ONE OF', 'values': keys }
                     ]
 
-                cb null
-
-        # Turn into a query object.
-        (cb) ->
-            self.service.query out.query, (query) ->
-                cb null, query
-
-        # Turn into a list.
-        (query, cb) ->
-            query.saveAsList
-                'name': +new Date
-                'tags': [ 'app', 'identifier-resolution' ]
-            , (list) ->
-                out.list = list.name
                 cb null
 
         # Call back with the input and output.
@@ -119,7 +108,7 @@ class exports.App
 
         # Get the types.
         async.waterfall [ (cb) ->
-            self.service.fetchModel (model) ->
+            self.service.fetchModel (model) ->                
                 # Binary search tree of classes where items are sorted based on name.
                 classes = new buckets.BSTree (a, b) -> a[1].localeCompare(b[1])
                 
