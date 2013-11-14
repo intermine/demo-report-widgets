@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Resolve Identifiers",
     "description": "Resolve a bunch of identifiers in InterMine and return a PathQuery",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "dependencies": {
         "css": {
             "FoundationCSS": {
@@ -61,7 +61,7 @@ module.exports = {
         },
         // Provided input, if any.
         'provided': {
-            'identifiers': [ 'PPARG', 'MAD', 'EVIL', 'GENIUS' ],
+            'identifiers': [ 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS', 'PPARG', 'MAD', 'EVIL', 'GENIUS' ],
             'type': 'Gene',
             'organism': 'D. melanogaster'
         },
