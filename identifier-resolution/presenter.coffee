@@ -2,6 +2,7 @@ class Form extends Backbone.View
 
     events:
         'click button': 'submit'
+        'keyup textarea[name="input"]': 'resize'
 
     initialize: (@config, @templates, @service) ->
 
@@ -83,6 +84,22 @@ class Form extends Backbone.View
         ], (err) ->
             self.config.cb err, false, out
 
+    # Potentially resize textarea field for its content.
+    resize: (evt) =>
+        # We can be called programatically too...
+        if evt
+            el = evt.target
+        else
+            el = $(@el).find('textarea[name="input"]')[0]
+
+        # Keep making me bigger...
+        do onesie = ->
+            if el.clientHeight < el.scrollHeight
+                # Add some height.
+                $(el).css 'height', el.clientHeight + 10 + 'px'
+                # Check once it has re-rendered.
+                setTimeout onesie, 10
+
 # This is my app definition, needs to have a set signature.
 class exports.App
 
@@ -151,5 +168,8 @@ class exports.App
             # Render into the target el.
             target.html view.render().el
     
+            # Resize it.
+            do view.resize
+
             # Foundation custom forms.
             target.foundation('forms')
