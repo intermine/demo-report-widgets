@@ -3,7 +3,7 @@ module.exports = {
     "author": "Radek <rs676@cam.ac.uk>",
     "title": "Resolve Identifiers",
     "description": "Resolve a bunch of identifiers in InterMine and return a PathQuery",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "dependencies": {
         "css": {
             "FoundationCSS": {
@@ -15,7 +15,7 @@ module.exports = {
                 "path": "http://cdn.intermine.org/js/jquery/1.10.1/jquery.min.js"
             },
             "_": {
-                "path": "http://cdn.intermine.org/js/underscore.js/1.3.3/underscore-min.js"
+                "path": "http://cdn.intermine.org/js/lodash/2.3.0/lodash.js"
             },
             "Backbone": {
                 "path": "http://cdn.intermine.org/js/backbone.js/0.9.2/backbone-min.js",
@@ -61,9 +61,9 @@ module.exports = {
         },
         // Provided input, if any.
         'provided': {
-            'identifiers': [ 'MAD' ],
+            'identifiers': [ 'PPARG', 'MAD', 'EVIL', 'GENIUS' ],
             'type': 'Gene',
-            'organism': 'C. elegans'
+            'organism': 'D. melanogaster'
         },
         // A callback called at least once.
         cb: function(err, working, out) {
