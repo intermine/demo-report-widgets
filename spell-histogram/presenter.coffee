@@ -79,12 +79,12 @@ class exports.App
             if symbol isnt @config.symbol
                 @config.symbol = symbol
                 # Render then.
-                @histogram()
+                do @histogram
 
         # Make the initial graph rendering after fetching Google Visualization packages.
         google.load 'visualization', '1.0',
             'packages': [ 'corechart' ]
-            callback: => @histogram()
+            'callback': @histogram
 
     # Make a clone of the PathQuery, bin data and display them.
     histogram: =>
@@ -108,14 +108,9 @@ class exports.App
             'op':    'LOOKUP'
             'value': @config.symbol
 
-        # Make a service...
-        serviceP = (service, pq) -> service.query(pq)
-        # ... turn q into rows...
-        rowsP    = (q) -> q.rows()
-        # ... handle problems...
-        error    = (err) -> loading.text(err.error).addClass('alert')
-
-        $.when(serviceP(@service, pq)).then(rowsP).fail(error).then (rows) =>
+        return @service.rows(pq).then (rows, res) =>
+            return loading.text('Error').addClass('alert') if res.error
+            
             # Flatten.
             rows = ( x.pop() for x in rows )
 
@@ -129,14 +124,18 @@ class exports.App
             data = d3.layout.histogram().bins(x.ticks(20))(rows)
 
             # Coerce the data into the Google Visualization format.
-            twoDArray = _(data).map (bin) -> from = Math.round(x(bin.x)) ; [ "#{from} to #{from + 2}", bin.y ]
+            twoDArray = _.map data, (bin) ->
+                from = Math.round(x(bin.x))
+                [ "#{from} to #{from + 2}", bin.y ]
 
             # Remove loading sign.
-            loading.remove()
+            do loading.remove
 
             # Point the chart to render to the `target` element's specified `chart` div.
-            chart = new google.visualization.ColumnChart $(@target).find('.chart')[0]
-            
-            # 1. Take the 2-dimensional array and turn it into a DataTable, first row is header labels.
-            # 2. Draw the visualization on the page passing in options that we specified higher up.
-            chart.draw(google.visualization.arrayToDataTable(twoDArray, false), @chartOptions)
+            el = $(@target).find('.chart')[0]
+            chart = new google.visualization.ColumnChart el
+
+            # Take the 2-dimensional array and turn it into a DataTable.
+            table = google.visualization.arrayToDataTable twoDArray, yes
+            # Draw the visualization on the page passing in options that we specified higher up.
+            chart.draw table, @chartOptions

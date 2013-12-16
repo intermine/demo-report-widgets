@@ -102,7 +102,6 @@ class exports.App
 
     # Create a new service connection.
     constructor: (@config, @templates) ->
-        console.log @config
         @service = new intermine.Service 'root': @config.mine
 
     # Render the graph.

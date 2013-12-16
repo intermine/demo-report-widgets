@@ -25,7 +25,7 @@ module.exports = {
                 "path": "http://cdn.intermine.org/js/underscore.js/1.3.3/underscore-min.js"
             },
             "intermine.imjs": {
-                "path": "http://cdn.intermine.org/js/intermine/imjs/latest/im.js",
+                "path": "http://cdn.intermine.org/js/intermine/imjs/2.9.2/im.js",
                 "depends": [
                     "jQuery",
                     "_"

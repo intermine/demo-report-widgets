@@ -29,7 +29,7 @@ module.exports = {
                 ]
             },
             "intermine.imjs": {
-                "path": "http://cdn.intermine.org/js/intermine/imjs/latest/im.js",
+                "path": "http://cdn.intermine.org/js/intermine/imjs/2.9.2/im.js",
                 "depends": [
                     "jQuery",
                     "_"
